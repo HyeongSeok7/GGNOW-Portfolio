@@ -1,0 +1,151 @@
+.content {
+    padding: 0;
+}
+
+.customer-hero-card,
+.customer-faq-card,
+.customer-contact-card {
+    border-radius: 30px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 16px 36px rgba(73, 91, 131, 0.08);
+}
+
+.customer-hero-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 32px;
+    margin-bottom: 24px;
+    background:
+        linear-gradient(135deg, rgba(243, 246, 255, 0.95), rgba(255, 255, 255, 0.92));
+}
+
+.customer-hero-copy h1 {
+    margin: 10px 0 12px;
+    font-size: 42px;
+    color: #1f2b45;
+}
+
+.customer-hero-copy p:last-child {
+    margin: 0;
+    color: #66748c;
+    font-size: 17px;
+}
+
+.customer-hero-badge {
+    min-width: 220px;
+    min-height: 150px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #eef2ff, #f7efff);
+    color: #5c63ff;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.customer-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+}
+
+.customer-faq-card,
+.customer-contact-card {
+    padding: 30px;
+}
+
+.faq-list {
+    display: grid;
+    gap: 16px;
+}
+
+.faq-item {
+    padding: 20px 22px;
+    border-radius: 22px;
+    background: #f8fbff;
+    border: 1px solid #e3eaf5;
+}
+
+.faq-item h3 {
+    margin: 0 0 8px;
+    font-size: 19px;
+    color: #22304a;
+}
+
+.faq-item p {
+    margin: 0;
+    color: #66748c;
+    line-height: 1.7;
+}
+
+.portfolio-contact-form {
+    display: grid;
+    gap: 12px;
+}
+
+.portfolio-contact-form label {
+    margin-top: 6px;
+    color: #24324a;
+    font-size: 15px;
+}
+
+.portfolio-contact-form input,
+.portfolio-contact-form textarea {
+    width: 100%;
+    padding: 16px 18px;
+    border: 1px solid #dbe4f1;
+    border-radius: 18px;
+    background: #fbfdff;
+    font-size: 15px;
+    color: #24324a;
+    resize: vertical;
+}
+
+.portfolio-contact-form input:focus,
+.portfolio-contact-form textarea:focus {
+    outline: none;
+    border-color: #7a86ff;
+    box-shadow: 0 0 0 4px rgba(122, 134, 255, 0.12);
+}
+
+.portfolio-contact-form button {
+    margin-top: 8px;
+    min-height: 54px;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #5b6df8, #7a5af8);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(91, 109, 248, 0.18);
+}
+
+.portfolio-contact-form button:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 980px) {
+    .customer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-hero-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .customer-hero-copy h1 {
+        font-size: 34px;
+    }
+
+    .customer-hero-badge {
+        width: 100%;
+    }
+}

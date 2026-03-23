@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+	<link rel="stylesheet" href="/assets/css/base.css">
+	<link rel="stylesheet" href="/assets/css/main.css?v=3.0">
+	<link rel="stylesheet" href="/assets/css/mypage.css">
+    <title>마이페이지</title>
+</head>
+<body class="event-page">
+<div class="container">
+    <aside class="sidebar">
+        <div class="logo">
+            <a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
+        </div>
+        <div class="profile">
+            <div class="mypage-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+            </div>
+            <a href="/mypage"><span>마이페이지</span></a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/main">메인페이지</a>
+            <a href="/performance">공연행사</a>
+            <a href="/education">교육행사</a>
+            <a href="/culture">문화행사</a>
+            <a href="/exhibition">전시행사</a>
+        </nav>
+        <div class="footer">
+            <img src="/images/banner2.png" alt="변화의 중심, 기회의 경기">
+        </div>
+    </aside>
+
+    <main class="main-content event-shell">
+    <header class="top-nav home-top-nav">
+        <nav>
+            <a href="/main">메인페이지</a>
+            <a href="/performance">공연행사</a>
+            <a href="/education">교육행사</a>
+            <a href="/culture">문화행사</a>
+            <a href="/exhibition">전시행사</a>
+            <a href="/customer">고객센터</a>
+        </nav>
+        <div class="auth" id="authSection">
+            <a href="/login"><span>로그인 / 회원가입</span></a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div>
+            <p class="hero-badge">MY FESTIVAL PAGE</p>
+            <h1 th:text="${user != null ? user.username + '님의 마이페이지' : '마이페이지'}">마이페이지</h1>
+            <p class="hero-desc">관심 행사와 계정 정보를 한눈에 관리해보세요.</p>
+        </div>
+        <div class="hero-actions">
+            <a href="/change-password" class="hero-action-btn primary">비밀번호 변경</a>
+            <a href="/my-reviews" class="hero-action-btn secondary">작성 리뷰 조회</a>
+        </div>
+    </section>
+
+    <section class="profile-summary card-surface">
+        <div class="profile-summary__avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+            </svg>
+        </div>
+
+        <div class="profile-summary__info" th:if="${user != null}">
+            <h2 th:text="${user.username}">사용자명</h2>
+            <div class="profile-meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">이메일</span>
+                    <strong th:text="${user.email}">email@example.com</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">가입일</span>
+                    <strong th:text="${user.joinDate}">2026-03-12</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">계정 상태</span>
+                    <strong>정상</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-summary__info" th:if="${user == null}">
+            <h2>사용자 정보를 불러오지 못했습니다.</h2>
+            <p>다시 로그인 후 이용해주세요.</p>
+        </div>
+    </section>
+
+    <section class="mypage-grid">
+        <div class="favorites-section card-surface">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">FAVORITES</p>
+                    <h2>즐겨찾기한 행사</h2>
+                </div>
+                <span class="section-count" th:text="${#lists.size(favoriteEvents)} + '개'">0개</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(favoriteEvents)}" class="empty-state">
+                <div class="empty-icon">★</div>
+                <p class="empty-title">아직 저장한 행사가 없어요</p>
+                <p class="empty-desc">관심 있는 공연, 전시, 문화행사를 즐겨찾기해두면 여기서 바로 확인할 수 있어요.</p>
+                <a href="/main" class="empty-link">행사 둘러보기</a>
+            </div>
+
+            <div th:each="event : ${favoriteEvents}" class="event-card">
+                <a class="event-link" th:href="@{/festival/{title}(title=${event.title})}">
+                    <img class="event-thumb"
+                         th:src="${event.imageUrl != null && !#strings.isEmpty(event.imageUrl) ? event.imageUrl : '/images/banner2.png'}"
+                         alt="행사 이미지">
+                    <div class="event-info">
+                        <span class="event-chip">FESTIVAL</span>
+                        <h3 th:text="${event.title}">행사 제목</h3>
+
+                        <p>
+                            <strong>기간</strong>
+                            <span th:text="${event.beginDe != null && !#strings.isEmpty(event.beginDe) ? event.beginDe : '공식 홈페이지 참고'}"></span>
+                            <span th:if="${event.beginDe != null && !#strings.isEmpty(event.beginDe) && event.endDe != null && !#strings.isEmpty(event.endDe)}"> ~ </span>
+                            <span th:text="${event.endDe != null && !#strings.isEmpty(event.endDe) ? event.endDe : ''}"></span>
+                        </p>
+
+                        <p>
+                            <strong>운영시간</strong>
+                            <span th:text="${event.eventTmInfo != null && !#strings.isEmpty(event.eventTmInfo) ? event.eventTmInfo : '공식 홈페이지 참고'}"></span>
+                        </p>
+
+                        <p>
+                            <strong>참가비</strong>
+                            <span th:text="${event.partcptExpnInfo != null && !#strings.isEmpty(event.partcptExpnInfo) ? event.partcptExpnInfo : '공식 홈페이지 참고'}"></span>
+                        </p>
+                    </div>
+                </a>
+
+                <button type="button"
+                        class="favorite-remove-btn"
+                        th:attr="data-event-id=${event.favoriteId}">
+                    즐겨찾기 해제
+                </button>
+            </div>
+        </div>
+
+        <aside class="mypage-menu card-surface">
+            <p class="section-kicker">QUICK MENU</p>
+            <h3>내 계정 관리</h3>
+            <p class="menu-desc">마이페이지 관련 기능을 빠르게 이동할 수 있어요.</p>
+
+            <a href="/change-password" class="menu-link">
+                <span>비밀번호 변경</span>
+                <strong>→</strong>
+            </a>
+
+            <a href="/my-reviews" class="menu-link">
+                <span>작성 리뷰 조회</span>
+                <strong>→</strong>
+            </a>
+
+            <a href="/main" class="menu-link muted">
+                <span>메인으로 돌아가기</span>
+                <strong>→</strong>
+            </a>
+        </aside>
+    </section>
+</main>
+<script src="/assets/js/base.js"></script>
+<script src="/assets/js/mypage-favorites.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>로그인</title>
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.0">
+    <link rel="stylesheet" href="/assets/css/auth.css?v=1.0">
+</head>
+<body class="event-page">
+
+<div class="container">
+    <aside class="sidebar">
+        <div class="logo">
+            <a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
+        </div>
+        <div class="profile">
+            <div class="mypage-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+            </div>
+            <a href="/mypage"><span>마이페이지</span></a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/main">메인페이지</a>
+            <a href="/performance">공연행사</a>
+            <a href="/education">교육행사</a>
+            <a href="/culture">문화행사</a>
+            <a href="/exhibition">전시행사</a>
+        </nav>
+        <div class="footer">
+            <img src="/images/banner2.png" alt="변화의 중심, 기회의 경기">
+        </div>
+    </aside>
+
+<main class="main-content event-shell">
+        <header class="top-nav home-top-nav">
+            <nav>
+                <a href="/main">메인페이지</a>
+                <a href="/performance">공연행사</a>
+                <a href="/education">교육행사</a>
+                <a href="/culture">문화행사</a>
+                <a href="/exhibition">전시행사</a>
+                <a href="/customer">고객센터</a>
+            </nav>
+            <div class="auth" id="authSection">
+                <a href="/login"><span>로그인 / 회원가입</span></a>
+            </div>
+        </header>
+
+        <section class="auth-hero">
+            <div class="auth-hero__copy">
+                <p class="auth-badge">WELCOME BACK</p>
+                <h1>다시 만나서 반가워요</h1>
+                <p class="auth-hero__desc">
+                    즐겨찾기와 리뷰, 마이페이지 기능을 더 편하게 이용해보세요.
+                </p>
+            </div>
+
+            <div class="auth-hero__visual">
+                <div class="auth-hero__blob"></div>
+                <img src="/images/banner2.png" alt="경기도 행사 배너">
+            </div>
+        </section>
+
+        <section class="auth-layout">
+            <div class="auth-card">
+                <div class="auth-card__head">
+                    <p class="section-kicker">LOGIN</p>
+                    <h2>로그인</h2>
+                    <p>아이디와 비밀번호를 입력해주세요.</p>
+                </div>
+
+                <div th:if="${param.error}" class="auth-feedback error">
+                    아이디 또는 비밀번호가 올바르지 않습니다.
+                </div>
+
+                <div th:if="${param.logout}" class="auth-feedback success">
+                    정상적으로 로그아웃되었습니다.
+                </div>
+
+                <div th:if="${param.passwordChanged}" class="auth-feedback success">
+                    비밀번호가 변경되었습니다. 다시 로그인해주세요.
+                </div>
+
+                <form th:action="@{/login}" method="post" class="auth-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <div class="form-group">
+                        <label for="username">아이디</label>
+                        <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn">로그인</button>
+                </form>
+
+                <div class="auth-divider"><span>또는</span></div>
+
+                <div class="social-login">
+                    <a href="#미구현" class="social-btn kakao-login">카카오로 로그인</a>
+                    <a href="#미구현" class="social-btn naver-login">네이버로 로그인</a>
+                </div>
+
+                <div class="auth-bottom-text">
+                    계정이 없으신가요? <a href="/register">회원가입</a>
+                </div>
+            </div>
+
+            <aside class="auth-side-card">
+                <p class="section-kicker">FESTIVAL GUIDE</p>
+                <h3>로그인하면 더 편해져요</h3>
+
+                <div class="auth-benefit-list">
+                    <div class="auth-benefit-item">
+                        <strong>즐겨찾기 저장</strong>
+                        <span>관심 있는 행사를 따로 모아볼 수 있어요.</span>
+                    </div>
+
+                    <div class="auth-benefit-item">
+                        <strong>리뷰 작성</strong>
+                        <span>참여한 행사 후기를 직접 남길 수 있어요.</span>
+                    </div>
+
+                    <div class="auth-benefit-item">
+                        <strong>마이페이지 관리</strong>
+                        <span>비밀번호 변경과 작성 리뷰 조회가 가능해요.</span>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+</div>
+
+<script src="/assets/js/base.js"></script>
+</body>
+</html>
