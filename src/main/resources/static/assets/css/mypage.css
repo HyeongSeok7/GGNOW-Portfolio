@@ -450,8 +450,17 @@ body {
     color: #fff;
     font-size: 15px;
     font-family: inherit;
+    font-weight: 700;
     cursor: pointer;
     box-shadow: 0 12px 22px rgba(91, 109, 248, 0.22);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+
+    box-sizing: border-box;
 }
 
 .feedback-message {

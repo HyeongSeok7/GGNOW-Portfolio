@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mariadb:11.4
+    container_name: ggnow-db
+    restart: always
+    environment:
+      MARIADB_DATABASE: ggnow
+      MARIADB_USER: ggnow_user
+      MARIADB_PASSWORD: ggnow_pass
+      MARIADB_ROOT_PASSWORD: root_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: ggnow-app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      API_BASE_URL: https://openapi.gg.go.kr/GGCULTUREVENTSTUS
+      API_KEY: 여기에_네_실제_API_KEY
+      DB_URL: jdbc:mariadb://db:3306/ggnow
+      DB_USER: ggnow_user
+      DB_PASSWORD: ggnow_pass
+      PORT: 8080
+
+volumes:
+  mariadb_data:
