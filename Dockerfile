@@ -1,12 +1,23 @@
-FROM gradle:8.10.2-jdk17 AS build
+# syntax=docker/dockerfile:1
+
+FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
-COPY . .
-RUN gradle clean bootJar --no-daemon
+
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY src src
+
+RUN chmod +x ./gradlew
+RUN ./gradlew clean bootJar -x test
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
+
 COPY --from=build /app/build/libs/*.jar app.jar
 
+ENV PORT=8080
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=$PORT -jar /app/app.jar"]
