@@ -71,10 +71,17 @@
         </div>
 
         <div class="detail-hero__visual">
-            <div class="detail-hero__blob"></div>
-            <img th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner2.png'}"
-                 alt="행사 이미지">
-        </div>
+    		<div class="detail-hero__blob"></div>
+
+    		<button type="button"
+            	class="detail-image-trigger"
+            	id="detailImageTrigger"
+            	aria-label="행사 이미지 크게 보기">
+        	<img id="detailHeroImage"
+             th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner2.png'}"
+             alt="행사 이미지">
+    		</button>
+		</div>
     </section>
 
     <section class="detail-page-stack">
@@ -215,6 +222,23 @@
     </div>
 </div>
 </main>
+
+<div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+    <div class="image-lightbox__backdrop" id="imageLightboxBackdrop"></div>
+
+    <div class="image-lightbox__dialog" role="dialog" aria-modal="true" aria-label="행사 이미지 크게 보기">
+        <button type="button"
+                class="image-lightbox__close"
+                id="imageLightboxClose"
+                aria-label="닫기">×</button>
+
+        <img src=""
+             alt="확대 이미지"
+             class="image-lightbox__img"
+             id="imageLightboxImg">
+    </div>
+</div>
+
 <script src="/assets/js/detail.js"></script>
 <script src="/assets/js/base.js"></script>
 </body>

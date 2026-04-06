@@ -393,3 +393,44 @@ document.addEventListener("DOMContentLoaded", () => {
     loadFavoriteState();
 });
 
+function initializeDetailImageLightbox() {
+    const trigger = document.getElementById('detailImageTrigger');
+    const heroImage = document.getElementById('detailHeroImage');
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('imageLightboxImg');
+    const closeBtn = document.getElementById('imageLightboxClose');
+    const backdrop = document.getElementById('imageLightboxBackdrop');
+
+    if (!trigger || !heroImage || !lightbox || !lightboxImg || !closeBtn || !backdrop) {
+        return;
+    }
+
+    function openLightbox() {
+        lightboxImg.src = heroImage.src;
+        lightboxImg.alt = heroImage.alt || '확대 이미지';
+        lightbox.classList.add('is-open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-open');
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('is-open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightboxImg.src = '';
+        document.body.classList.remove('lightbox-open');
+    }
+
+    trigger.addEventListener('click', openLightbox);
+    closeBtn.addEventListener('click', closeLightbox);
+    backdrop.addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
+            closeLightbox();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    initializeDetailImageLightbox();
+});

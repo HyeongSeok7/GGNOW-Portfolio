@@ -2084,3 +2084,293 @@ body.event-page {
         radial-gradient(circle at top, rgba(255, 181, 72, 0.18), transparent 45%),
         linear-gradient(180deg, #fff8eb 0%, #fff3f8 100%);
 }
+
+@keyframes softFloat {
+    0% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -10px, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes softFloatSmall {
+    0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50% { transform: translate3d(0, -6px, 0) rotate(1deg); }
+    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+@keyframes blobBreath {
+    0% {
+        transform: rotate(-8deg) scale(1);
+        opacity: 0.78;
+    }
+    50% {
+        transform: rotate(-4deg) scale(1.05);
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(-8deg) scale(1);
+        opacity: 0.78;
+    }
+}
+
+@keyframes glowMove {
+    0% {
+        transform: translateX(-120%) rotate(8deg);
+        opacity: 0;
+    }
+    35% {
+        opacity: 0.28;
+    }
+    100% {
+        transform: translateX(140%) rotate(8deg);
+        opacity: 0;
+    }
+}
+
+@keyframes panelGlow {
+    0%, 100% {
+        box-shadow: 0 18px 36px rgba(73, 91, 131, 0.08);
+    }
+    50% {
+        box-shadow: 0 22px 42px rgba(109, 123, 194, 0.12);
+    }
+}
+
+
+/* ===== Soft scroll reveal and motion ===== */
+.motion-ready .motion-target {
+    opacity: 0;
+    transform: translateY(44px) scale(0.97);
+    filter: blur(12px);
+    transition:
+        opacity 0.9s ease,
+        transform 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.95s ease;
+    will-change: opacity, transform, filter;
+}
+
+.motion-ready .motion-target.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+.motion-target[data-motion-delay="1"] { transition-delay: 0.05s; }
+.motion-target[data-motion-delay="2"] { transition-delay: 0.15s; }
+.motion-target[data-motion-delay="3"] { transition-delay: 0.25s; }
+.motion-target[data-motion-delay="4"] { transition-delay: 0.35s; }
+.motion-target[data-motion-delay="5"] { transition-delay: 0.45s; }
+.motion-target[data-motion-delay="6"] { transition-delay: 0.55s; }
+
+.hero-card {
+    animation: panelGlow 6s ease-in-out infinite;
+}
+
+.hero-card::before {
+    content: "";
+    position: absolute;
+    inset: auto auto -80px -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(173, 216, 255, 0.28), transparent 70%);
+    pointer-events: none;
+    filter: blur(6px);
+}
+
+.hero-blob {
+    animation: blobBreath 7s ease-in-out infinite;
+}
+
+.hero-visual img {
+    animation: softFloat 5.5s ease-in-out infinite;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.hero-card:hover .hero-visual img {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 22px 42px rgba(76, 93, 133, 0.18);
+}
+
+.search-panel__mascot img {
+    animation: softFloatSmall 4.8s ease-in-out infinite;
+}
+
+.category-card,
+.dreamy-festival-card,
+.home-info-panels .info-panel,
+.search-panel,
+.category-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.category-card::before,
+.dreamy-festival-card::before,
+.home-info-panels .info-panel::before,
+.search-panel::before,
+.category-section::before {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -30%;
+    width: 60%;
+    height: 160%;
+    background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.00) 30%,
+        rgba(255, 255, 255, 0.26) 50%,
+        rgba(255, 255, 255, 0.00) 70%,
+        transparent 100%
+    );
+    pointer-events: none;
+    opacity: 0;
+}
+
+.category-card:hover::before,
+.dreamy-festival-card:hover::before,
+.home-info-panels .info-panel:hover::before,
+.search-panel:hover::before,
+.category-section:hover::before {
+    animation: glowMove 1.15s ease;
+}
+
+.category-card,
+.dreamy-festival-card,
+.home-info-panels .info-panel,
+.hero-card,
+.result-card,
+.faq-card,
+.notice-card,
+.search-panel,
+.event-search-panel {
+    transition:
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s ease,
+        border-color 0.35s ease,
+        background-color 0.35s ease;
+}
+
+.category-card:hover,
+.dreamy-festival-card:hover,
+.result-card:hover,
+.faq-card:hover,
+.notice-card:hover,
+.home-info-panels .info-panel:hover,
+.hero-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.10);
+}
+
+.search-panel:hover,
+.event-search-panel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+}
+
+.category-card__image img {
+    transition: transform 0.45s ease, filter 0.35s ease;
+}
+
+.category-card:hover .category-card__image img {
+    transform: scale(1.05);
+    filter: saturate(1.05);
+}
+
+.dreamy-image-container img {
+    transition: transform 0.5s ease, filter 0.35s ease;
+}
+
+.dreamy-festival-card:hover .dreamy-image-container img {
+    transform: scale(1.04);
+    filter: saturate(1.05);
+}
+
+.home-top-nav {
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+body.is-scrolled .home-top-nav {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 24px rgba(64, 84, 124, 0.08);
+    border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+.hero-btn,
+.dreamy-detail-btn,
+.result-detail-btn,
+button,
+.btn,
+a.btn,
+input[type="submit"],
+input[type="button"] {
+    transition:
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.22s ease,
+        background 0.22s ease,
+        background-color 0.22s ease,
+        border-color 0.22s ease,
+        color 0.22s ease;
+}
+
+.hero-btn:hover,
+.dreamy-detail-btn:hover,
+.result-detail-btn:hover,
+button:hover,
+.btn:hover,
+a.btn:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    transform: translateY(-3px);
+}
+
+a {
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease,
+        text-decoration-color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .motion-ready .motion-target,
+    .motion-ready .motion-target.is-visible,
+    .hero-card,
+    .hero-blob,
+    .hero-visual img,
+    .search-panel__mascot img,
+    .category-card,
+    .dreamy-festival-card,
+    .home-info-panels .info-panel,
+    .result-card,
+    .faq-card,
+    .notice-card,
+    .search-panel,
+    .event-search-panel,
+    .hero-btn,
+    .dreamy-detail-btn,
+    .result-detail-btn,
+    button,
+    .btn,
+    a.btn,
+    input[type="submit"],
+    input[type="button"],
+    a {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+        opacity: 1 !important;
+    }
+
+    body.is-scrolled .home-top-nav {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+

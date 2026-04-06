@@ -1,60 +1,38 @@
-// 로그인 상태 확인
-fetch('/check-login')
-    .then(response => response.text())
-    .then(data => {
-        const authSection = document.getElementById("authSection");
-        const stars = document.querySelectorAll(".star-icon");
+console.log('BASE_JS_FILE_LOADED');
 
-        if (!authSection) return;
+function getCsrfInfo() {
+    const tokenMeta = document.querySelector('meta[name="_csrf"]');
+    const headerMeta = document.querySelector('meta[name="_csrf_header"]');
 
-        if (data.includes("로그인 상태입니다")) {
-            authSection.innerHTML = `
-                <a href="/mypage" class="auth-btn"><span>마이페이지</span></a>
-                <button type="button" id="logoutBtn" class="auth-btn"><span>로그아웃</span></button>
-            `;
+    return {
+        token: tokenMeta ? tokenMeta.getAttribute('content') : '',
+        header: headerMeta ? headerMeta.getAttribute('content') : ''
+    };
+}
 
-            const logoutBtn = document.getElementById("logoutBtn");
-            logoutBtn?.addEventListener("click", () => {
-                const token = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
-                const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content");
+function createCsrfHeaders(baseHeaders) {
+    const csrf = getCsrfInfo();
+    const headers = baseHeaders ? { ...baseHeaders } : {};
 
-                fetch("/logout", {
-                    method: "POST",
-                    credentials: "same-origin",
-                    headers: header && token ? { [header]: token } : {}
-                })
-                    .then(() => {
-                        window.location.href = "/main";
-                    })
-                    .catch(err => {
-                        console.error("로그아웃 오류:", err);
-                        window.location.href = "/main";
-                    });
-            });
-        } else {
-            authSection.innerHTML = `<a href="/login"><span>로그인 / 회원가입</span></a>`;
-            stars.forEach(star => {
-                star.style.display = "none";
-            });
-        }
-    })
-    .catch(error => {
-        console.error("오류 발생:", error);
-        const authSection = document.getElementById("authSection");
-        if (authSection) {
-            authSection.innerText = "로그인 상태를 확인할 수 없습니다.";
-        }
-    });
+    if (csrf.header && csrf.token) {
+        headers[csrf.header] = csrf.token;
+    }
+
+    return headers;
+}
 
 function parseDate(str) {
     if (!str) return new Date('2100-01-01');
-    if (str.includes('-')) return new Date(str);
+
+    if (str.indexOf('-') > -1) {
+        return new Date(str);
+    }
 
     if (str.length === 8) {
         const year = str.substring(0, 4);
         const month = str.substring(4, 6);
         const day = str.substring(6, 8);
-        return new Date(`${year}-${month}-${day}`);
+        return new Date(year + '-' + month + '-' + day);
     }
 
     return new Date('2100-01-01');
@@ -69,7 +47,7 @@ function sortEvents() {
     const option = sortSelect.value;
     const cards = Array.from(list.querySelectorAll('.festival-card'));
 
-    cards.sort((a, b) => {
+    cards.sort(function (a, b) {
         const startA = parseDate(a.getAttribute('data-start'));
         const startB = parseDate(b.getAttribute('data-start'));
         const endA = parseDate(a.getAttribute('data-end'));
@@ -82,49 +60,122 @@ function sortEvents() {
         return endA - endB;
     });
 
-    cards.forEach(card => list.appendChild(card));
+    cards.forEach(function (card) {
+        list.appendChild(card);
+    });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const stars = document.querySelectorAll('.star-icon');
-    const sortSelect = document.getElementById('sortOption');
-    const token = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
-    const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content");
+function normalizeFestivalTitles() {
+    const titles = document.querySelectorAll('.festival-card h2');
 
-    if (sortSelect) {
-        sortSelect.addEventListener('change', sortEvents);
-        sortEvents();
+    titles.forEach(function (title) {
+        title.textContent = title.textContent.replace(/\s+/g, ' ').trim();
+    });
+}
+
+function bindLogoutButton() {
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (!logoutBtn) return;
+
+    logoutBtn.addEventListener('click', function () {
+        fetch('/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: createCsrfHeaders({})
+        })
+            .then(function () {
+                window.location.href = '/main';
+            })
+            .catch(function (err) {
+                console.error('로그아웃 오류:', err);
+                window.location.href = '/main';
+            });
+    });
+}
+
+function updateAuthSection(isLoggedIn) {
+    const authSection = document.getElementById('authSection');
+    const stars = document.querySelectorAll('.star-icon');
+
+    if (!authSection) return;
+
+    if (isLoggedIn) {
+        authSection.innerHTML =
+            '<a href="/mypage" class="auth-btn"><span>마이페이지</span></a>' +
+            '<button type="button" id="logoutBtn" class="auth-btn"><span>로그아웃</span></button>';
+
+        bindLogoutButton();
+        return;
     }
 
-    document.querySelectorAll('.festival-card h2').forEach(h2 => {
-        h2.textContent = h2.textContent.replace(/\s+/g, ' ').trim();
+    authSection.innerHTML = '<a href="/login"><span>로그인 / 회원가입</span></a>';
+
+    stars.forEach(function (star) {
+        star.style.display = 'none';
     });
+}
 
-    if (stars.length === 0) return;
+function checkLoginStatus() {
+    return fetch('/check-login', {
+        credentials: 'same-origin'
+    })
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (data) {
+            return data.indexOf('로그인 상태입니다') > -1;
+        });
+}
 
-    fetch('/check-login')
-        .then(response => response.text())
-        .then(data => {
-            if (!data.includes("로그인 상태입니다")) {
-                stars.forEach(star => {
-                    star.style.display = "none";
+function initializeAuth() {
+    checkLoginStatus()
+        .then(function (isLoggedIn) {
+            updateAuthSection(isLoggedIn);
+        })
+        .catch(function (error) {
+            console.error('오류 발생:', error);
+
+            const authSection = document.getElementById('authSection');
+            if (authSection) {
+                authSection.innerText = '로그인 상태를 확인할 수 없습니다.';
+            }
+        });
+}
+
+function initializeFavorites() {
+    const stars = document.querySelectorAll('.star-icon');
+
+    if (!stars.length) return;
+
+    checkLoginStatus()
+        .then(function (isLoggedIn) {
+            if (!isLoggedIn) {
+                stars.forEach(function (star) {
+                    star.style.display = 'none';
                 });
                 return;
             }
 
-            fetch('/getFavoriteEvents')
-                .then(response => response.json())
-                .then(favoriteEventIds => {
-                    stars.forEach(star => {
+            fetch('/getFavoriteEvents', {
+                credentials: 'same-origin'
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (favoriteEventIds) {
+                    stars.forEach(function (star) {
                         const eventId = star.dataset.eventId;
                         if (favoriteEventIds.includes(eventId)) {
                             star.classList.add('filled');
                         }
                     });
                 })
-                .catch(error => console.error('Error loading favorites:', error));
+                .catch(function (error) {
+                    console.error('Error loading favorites:', error);
+                });
 
-            stars.forEach(star => {
+            stars.forEach(function (star) {
                 star.addEventListener('click', function () {
                     const eventId = this.dataset.eventId;
                     const isFilled = this.classList.contains('filled');
@@ -132,26 +183,143 @@ document.addEventListener('DOMContentLoaded', function () {
                     const method = isFilled ? 'DELETE' : 'POST';
 
                     fetch(url, {
-                        method,
-                        credentials: "same-origin",
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(header && token ? { [header]: token } : {})
-                        },
+                        method: method,
+                        credentials: 'same-origin',
+                        headers: createCsrfHeaders({
+                            'Content-Type': 'application/json'
+                        }),
                         body: JSON.stringify({ event_id: eventId })
                     })
-                        .then(response => {
+                        .then(function (response) {
                             if (response.ok) {
-                                this.classList.toggle('filled');
+                                star.classList.toggle('filled');
                             } else {
                                 alert('작업 실패');
                             }
                         })
-                        .catch(error => {
+                        .catch(function (error) {
                             console.error('Error:', error);
                             alert('서버 오류');
                         });
                 });
             });
+        })
+        .catch(function (error) {
+            console.error('즐겨찾기 초기화 오류:', error);
         });
+}
+
+function initializeSort() {
+    const sortSelect = document.getElementById('sortOption');
+
+    if (!sortSelect) return;
+
+    sortSelect.addEventListener('change', sortEvents);
+    sortEvents();
+}
+
+function initializeScrollHeader() {
+    function onScroll() {
+        if (window.scrollY > 12) {
+            document.body.classList.add('is-scrolled');
+        } else {
+            document.body.classList.remove('is-scrolled');
+        }
+    }
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+function initializeMotion() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const motionGroups = [
+        '.hero-card',
+        '.section-intro',
+        '.search-panel',
+        '.category-section',
+        '.category-card',
+        '.home-info-panels .info-panel',
+        '.event-hero',
+        '.event-search-panel',
+        '.dreamy-festival-card',
+        '.result-card',
+        '.customer-hero-card',
+        '.faq-card',
+        '.notice-card'
+    ];
+
+    const motionTargets = document.querySelectorAll(motionGroups.join(','));
+
+    if (!motionTargets.length) return;
+
+    document.body.classList.add('motion-ready');
+
+    motionTargets.forEach(function (el, index) {
+        el.classList.add('motion-target');
+
+        const parentGrid = el.closest(
+            '.category-grid, .dreamy-event-grid, .home-info-panels, .portfolio-result-list'
+        );
+
+        if (parentGrid) {
+            const siblings = Array.from(parentGrid.children).filter(function (node) {
+                return node.classList && !node.classList.contains('empty-state');
+            });
+
+            const siblingIndex = siblings.indexOf(el);
+
+            if (siblingIndex > -1) {
+                el.setAttribute('data-motion-delay', String((siblingIndex % 6) + 1));
+            }
+        } else {
+            el.setAttribute('data-motion-delay', String((index % 4) + 1));
+        }
+    });
+
+    if (reduceMotion) {
+        motionTargets.forEach(function (el) {
+            el.classList.add('is-visible');
+        });
+        return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+        motionTargets.forEach(function (el) {
+            el.classList.add('is-visible');
+        });
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        function (entries, obs) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+
+                entry.target.classList.add('is-visible');
+                obs.unobserve(entry.target);
+            });
+        },
+        {
+            root: null,
+            rootMargin: '0px 0px -12% 0px',
+            threshold: 0.28
+        }
+    );
+
+    motionTargets.forEach(function (el) {
+        observer.observe(el);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('BASE_JS_DOM_READY');
+
+    initializeAuth();
+    initializeSort();
+    normalizeFestivalTitles();
+    initializeFavorites();
+    initializeMotion();
+    initializeScrollHeader();
 });
