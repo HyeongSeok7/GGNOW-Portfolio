@@ -38,7 +38,7 @@ function parseDate(str) {
     return new Date('2100-01-01');
 }
 
-function sortEvents() {
+function sortEvents(animate) {
     const sortSelect = document.getElementById('sortOption');
     const list = document.getElementById('eventList');
 
@@ -46,6 +46,8 @@ function sortEvents() {
 
     const option = sortSelect.value;
     const cards = Array.from(list.querySelectorAll('.festival-card'));
+
+    if (!cards.length) return;
 
     cards.sort(function (a, b) {
         const startA = parseDate(a.getAttribute('data-start'));
@@ -60,9 +62,52 @@ function sortEvents() {
         return endA - endB;
     });
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!animate || reduceMotion) {
+        cards.forEach(function (card) {
+            list.appendChild(card);
+            card.dataset.revealed = 'true';
+            card.style.opacity = '1';
+            card.style.transform = '';
+            card.style.filter = '';
+            card.style.pointerEvents = '';
+        });
+        return;
+    }
+
     cards.forEach(function (card) {
-        list.appendChild(card);
+        card.style.pointerEvents = 'none';
+
+        card.animate(
+            [
+                {
+                    opacity: 1,
+                    transform: 'translateY(0px) scale(1)',
+                    filter: 'blur(0px)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateY(14px) scale(0.985)',
+                    filter: 'blur(6px)'
+                }
+            ],
+            {
+                duration: 220,
+                easing: 'ease',
+                fill: 'forwards'
+            }
+        );
     });
+
+    setTimeout(function () {
+        cards.forEach(function (card) {
+            list.appendChild(card);
+            prepareCardForReveal(card);
+        });
+
+        revealCardsSequentially(cards, 75);
+    }, 240);
 }
 
 function normalizeFestivalTitles() {
@@ -214,8 +259,11 @@ function initializeSort() {
 
     if (!sortSelect) return;
 
-    sortSelect.addEventListener('change', sortEvents);
-    sortEvents();
+    sortEvents(false);
+
+    sortSelect.addEventListener('change', function () {
+        sortEvents(true);
+    });
 }
 
 function initializeScrollHeader() {
@@ -231,23 +279,70 @@ function initializeScrollHeader() {
     window.addEventListener('scroll', onScroll, { passive: true });
 }
 
+function initializeInteractiveCards() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    const cards = document.querySelectorAll('.dreamy-festival-card, .result-card');
+
+    cards.forEach(function (card) {
+        let frameId = null;
+
+        function resetCard() {
+            card.style.transform = '';
+            card.style.setProperty('--card-glow-x', '50%');
+            card.style.setProperty('--card-glow-y', '50%');
+        }
+
+        card.addEventListener('mousemove', function (event) {
+            const rect = card.getBoundingClientRect();
+            const offsetX = event.clientX - rect.left;
+            const offsetY = event.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateY = ((offsetX - centerX) / centerX) * 4;
+            const rotateX = ((centerY - offsetY) / centerY) * 3;
+
+            if (frameId) cancelAnimationFrame(frameId);
+
+            frameId = requestAnimationFrame(function () {
+                card.style.transform =
+                    'translateY(-8px) perspective(900px) rotateX(' +
+                    rotateX.toFixed(2) +
+                    'deg) rotateY(' +
+                    rotateY.toFixed(2) +
+                    'deg) scale(1.012)';
+
+                card.style.setProperty('--card-glow-x', offsetX + 'px');
+                card.style.setProperty('--card-glow-y', offsetY + 'px');
+            });
+        });
+
+        card.addEventListener('mouseleave', function () {
+            if (frameId) cancelAnimationFrame(frameId);
+            resetCard();
+        });
+    });
+}
+
 function initializeMotion() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const motionGroups = [
         '.hero-card',
-        '.section-intro',
-        '.search-panel',
-        '.category-section',
-        '.category-card',
-        '.home-info-panels .info-panel',
-        '.event-hero',
-        '.event-search-panel',
-        '.dreamy-festival-card',
-        '.result-card',
-        '.customer-hero-card',
-        '.faq-card',
-        '.notice-card'
+    	'.section-intro',
+    	'.search-panel',
+    	'.category-section',
+    	'.category-card',
+    	'.home-info-panels .info-panel',
+    	'.event-hero',
+    	'.event-search-panel',
+    	'.result-card',
+    	'.customer-hero-card',
+    	'.faq-card',
+    	'.notice-card'
     ];
 
     const motionTargets = document.querySelectorAll(motionGroups.join(','));
@@ -317,9 +412,122 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('BASE_JS_DOM_READY');
 
     initializeAuth();
-    initializeSort();
     normalizeFestivalTitles();
     initializeFavorites();
     initializeMotion();
     initializeScrollHeader();
+    initializeInteractiveCards();
+    initializeFestivalCardReveal();
+    initializeSort();
 });
+
+let festivalCardObserver = null;
+
+function prepareCardForReveal(card) {
+    card.dataset.revealed = 'false';
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(28px) scale(0.985)';
+    card.style.filter = 'blur(8px)';
+    card.style.pointerEvents = 'none';
+    card.style.willChange = 'opacity, transform, filter';
+}
+
+function revealCard(card, delay) {
+    if (!card || card.dataset.revealed === 'true') return;
+
+    const wait = typeof delay === 'number' ? delay : 0;
+
+    setTimeout(function () {
+        card.dataset.revealed = 'true';
+        card.style.pointerEvents = '';
+
+        card.animate(
+            [
+                {
+                    opacity: 0,
+                    transform: 'translateY(28px) scale(0.985)',
+                    filter: 'blur(8px)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateY(0px) scale(1)',
+                    filter: 'blur(0px)'
+                }
+            ],
+            {
+                duration: 650,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                fill: 'forwards'
+            }
+        );
+
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0px) scale(1)';
+        card.style.filter = 'blur(0px)';
+    }, wait);
+}
+
+function revealCardsSequentially(cards, step) {
+    cards.forEach(function (card, index) {
+        revealCard(card, index * step);
+    });
+}
+
+function initializeFestivalCardReveal() {
+    const list = document.getElementById('eventList');
+    if (!list) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
+
+    if (!cards.length) return;
+
+    if (festivalCardObserver) {
+        festivalCardObserver.disconnect();
+        festivalCardObserver = null;
+    }
+
+    if (reduceMotion) {
+        cards.forEach(function (card) {
+            card.dataset.revealed = 'true';
+            card.style.opacity = '1';
+            card.style.transform = '';
+            card.style.filter = '';
+            card.style.pointerEvents = '';
+        });
+        return;
+    }
+
+    cards.forEach(function (card) {
+        prepareCardForReveal(card);
+    });
+
+    if (!('IntersectionObserver' in window)) {
+        revealCardsSequentially(cards, 80);
+        return;
+    }
+
+    festivalCardObserver = new IntersectionObserver(
+        function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+
+                const card = entry.target;
+                const allCards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
+                const index = allCards.indexOf(card);
+
+                revealCard(card, (index % 6) * 80);
+                festivalCardObserver.unobserve(card);
+            });
+        },
+        {
+            root: null,
+            threshold: 0.18,
+            rootMargin: '0px 0px -10% 0px'
+        }
+    );
+
+    cards.forEach(function (card) {
+        festivalCardObserver.observe(card);
+    });
+}
