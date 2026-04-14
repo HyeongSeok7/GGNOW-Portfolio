@@ -2490,3 +2490,22 @@ a {
     }
 }
 
+.js-festival-reveal .event-page #eventList .festival-card,
+.js-festival-reveal .event-page #eventList .dreamy-festival-card {
+    opacity: 0;
+    transform: translateY(36px) scale(0.98);
+    filter: blur(10px);
+    transition:
+        opacity 0.7s ease,
+        transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.7s ease;
+    will-change: opacity, transform, filter;
+}
+
+.js-festival-reveal .event-page #eventList .festival-card.is-revealed,
+.js-festival-reveal .event-page #eventList .dreamy-festival-card.is-revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+

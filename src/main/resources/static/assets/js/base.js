@@ -64,57 +64,32 @@ function sortEvents(animate) {
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (reduceMotion) {
-    cards.forEach(function (card) {
-        list.appendChild(card);
-        card.dataset.revealed = 'true';
-        card.style.opacity = '1';
-        card.style.transform = '';
-        card.style.filter = '';
-        card.style.pointerEvents = '';
-    	});
-    	return;
-	}
+    if (!animate || reduceMotion) {
+        cards.forEach(function (card) {
+            list.appendChild(card);
+        });
 
-	if (!animate) {
-    	cards.forEach(function (card) {
-        	list.appendChild(card);
-    	});
-    	return;
-	}
+        if (!reduceMotion) {
+            initializeFestivalCardReveal();
+        } else {
+            cards.forEach(function (card) {
+                card.classList.add('is-revealed');
+            });
+        }
+        return;
+    }
 
     cards.forEach(function (card) {
-        card.style.pointerEvents = 'none';
-
-        card.animate(
-            [
-                {
-                    opacity: 1,
-                    transform: 'translateY(0px) scale(1)',
-                    filter: 'blur(0px)'
-                },
-                {
-                    opacity: 0,
-                    transform: 'translateY(14px) scale(0.985)',
-                    filter: 'blur(6px)'
-                }
-            ],
-            {
-                duration: 220,
-                easing: 'ease',
-                fill: 'forwards'
-            }
-        );
+        card.classList.remove('is-revealed');
     });
 
     setTimeout(function () {
         cards.forEach(function (card) {
             list.appendChild(card);
-            prepareCardForReveal(card);
         });
 
-        revealCardsSequentially(cards, 75);
-    }, 240);
+        initializeFestivalCardReveal();
+    }, 180);
 }
 
 function normalizeFestivalTitles() {
@@ -425,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeScrollHeader();
     initializeInteractiveCards();
     initializeSort();
-	initializeFestivalCardReveal();
+    initializeFestivalCardReveal();
 });
 
 let festivalCardObserver = null;
@@ -480,14 +455,15 @@ function revealCardsSequentially(cards, step) {
     });
 }
 
+
 function initializeFestivalCardReveal() {
     const list = document.getElementById('eventList');
     if (!list) return;
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
-
     if (!cards.length) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (festivalCardObserver) {
         festivalCardObserver.disconnect();
@@ -496,26 +472,17 @@ function initializeFestivalCardReveal() {
 
     if (reduceMotion) {
         cards.forEach(function (card) {
-            card.dataset.revealed = 'true';
-            card.style.opacity = '1';
-            card.style.transform = '';
-            card.style.filter = '';
-            card.style.pointerEvents = '';
+            card.classList.add('is-revealed');
         });
         return;
     }
 
     cards.forEach(function (card) {
-        prepareCardForReveal(card);
+        card.classList.remove('is-revealed');
     });
 
-    if (!('IntersectionObserver' in window)) {
-        revealCardsSequentially(cards, 80);
-        return;
-    }
-
     festivalCardObserver = new IntersectionObserver(
-        function (entries) {
+        function (entries, obs) {
             entries.forEach(function (entry) {
                 if (!entry.isIntersecting) return;
 
@@ -523,14 +490,17 @@ function initializeFestivalCardReveal() {
                 const allCards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
                 const index = allCards.indexOf(card);
 
-                revealCard(card, (index % 6) * 80);
-                festivalCardObserver.unobserve(card);
+                setTimeout(function () {
+                    card.classList.add('is-revealed');
+                }, (index % 4) * 90);
+
+                obs.unobserve(card);
             });
         },
         {
             root: null,
-            threshold: 0.18,
-            rootMargin: '0px 0px -10% 0px'
+            threshold: 0.35,
+            rootMargin: '0px 0px -5% 0px'
         }
     );
 
