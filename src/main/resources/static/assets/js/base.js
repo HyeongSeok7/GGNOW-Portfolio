@@ -410,48 +410,53 @@ document.addEventListener('DOMContentLoaded', function () {
 let festivalCardObserver = null;
 
 function prepareCardForReveal(card) {
-    card.dataset.revealed = 'false';
+    if (!card) return;
+
     card.style.opacity = '0';
-    card.style.transform = 'translateY(28px) scale(0.985)';
-    card.style.filter = 'blur(8px)';
+    card.style.transform = 'translateY(36px) scale(0.98)';
+    card.style.filter = 'blur(10px)';
     card.style.pointerEvents = 'none';
-    card.style.willChange = 'opacity, transform, filter';
+    card.dataset.revealed = 'false';
 }
 
 function revealCard(card, delay) {
     if (!card || card.dataset.revealed === 'true') return;
 
-    const wait = typeof delay === 'number' ? delay : 0;
+    const animationDelay = Number(delay) || 0;
 
-    setTimeout(function () {
-        card.dataset.revealed = 'true';
-        card.style.pointerEvents = '';
+    card.dataset.revealed = 'true';
+    card.style.pointerEvents = '';
 
+    if (typeof card.animate === 'function') {
         card.animate(
             [
                 {
                     opacity: 0,
-                    transform: 'translateY(28px) scale(0.985)',
-                    filter: 'blur(8px)'
+                    transform: 'translateY(36px) scale(0.98)',
+                    filter: 'blur(10px)'
                 },
                 {
                     opacity: 1,
-                    transform: 'translateY(0px) scale(1)',
-                    filter: 'blur(0px)'
+                    transform: 'translateY(0) scale(1)',
+                    filter: 'blur(0)'
                 }
             ],
             {
-                duration: 650,
+                duration: 720,
+                delay: animationDelay,
                 easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
                 fill: 'forwards'
             }
         );
+    }
 
+    window.setTimeout(function () {
         card.style.opacity = '1';
-        card.style.transform = 'translateY(0px) scale(1)';
-        card.style.filter = 'blur(0px)';
-    }, wait);
+        card.style.transform = 'translateY(0) scale(1)';
+        card.style.filter = 'blur(0)';
+    }, animationDelay);
 }
+
 
 function revealCardsSequentially(cards, step) {
     cards.forEach(function (card, index) {
@@ -464,15 +469,19 @@ function initializeFestivalCardReveal() {
     const list = document.getElementById('eventList');
     if (!list) return;
 
-    const cards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
-    if (!cards.length) return;
+    const cards = Array.from(
+        list.querySelectorAll('.festival-card, .dreamy-festival-card')
+    );
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!cards.length) return;
 
     if (festivalCardObserver) {
         festivalCardObserver.disconnect();
         festivalCardObserver = null;
     }
+
+    // 운영용 최종 버전
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reduceMotion) {
         cards.forEach(function (card) {
@@ -495,7 +504,9 @@ function initializeFestivalCardReveal() {
                 if (!entry.isIntersecting) return;
 
                 const card = entry.target;
-                const allCards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
+                const allCards = Array.from(
+                    list.querySelectorAll('.festival-card, .dreamy-festival-card')
+                );
                 const index = allCards.indexOf(card);
 
                 revealCard(card, (index % 4) * 90);
