@@ -1,4 +1,4 @@
-console.log('BASE_JS_FILE_LOADED');
+console.log('BASE_JS_FILE_LOADED_v4_0');
 
 function getCsrfInfo() {
     const tokenMeta = document.querySelector('meta[name="_csrf"]');
@@ -64,17 +64,24 @@ function sortEvents(animate) {
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (!animate || reduceMotion) {
-        cards.forEach(function (card) {
-            list.appendChild(card);
-            card.dataset.revealed = 'true';
-            card.style.opacity = '1';
-            card.style.transform = '';
-            card.style.filter = '';
-            card.style.pointerEvents = '';
-        });
-        return;
-    }
+    if (reduceMotion) {
+    cards.forEach(function (card) {
+        list.appendChild(card);
+        card.dataset.revealed = 'true';
+        card.style.opacity = '1';
+        card.style.transform = '';
+        card.style.filter = '';
+        card.style.pointerEvents = '';
+    	});
+    	return;
+	}
+
+	if (!animate) {
+    	cards.forEach(function (card) {
+        	list.appendChild(card);
+    	});
+    	return;
+	}
 
     cards.forEach(function (card) {
         card.style.pointerEvents = 'none';
@@ -409,7 +416,7 @@ function initializeMotion() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('BASE_JS_DOM_READY');
+    console.log('BASE_JS_DOM_READY_v4_0');
 
     initializeAuth();
     normalizeFestivalTitles();
@@ -417,8 +424,8 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeMotion();
     initializeScrollHeader();
     initializeInteractiveCards();
-    initializeFestivalCardReveal();
     initializeSort();
+	initializeFestivalCardReveal();
 });
 
 let festivalCardObserver = null;
