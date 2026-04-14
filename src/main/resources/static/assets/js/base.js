@@ -393,6 +393,10 @@ function initializeMotion() {
 document.addEventListener('DOMContentLoaded', function () {
     console.log('BASE_JS_DOM_READY_v4_0');
 
+    if (document.getElementById('eventList')) {
+        document.documentElement.classList.add('js-festival-reveal');
+    }
+
     initializeAuth();
     normalizeFestivalTitles();
     initializeFavorites();
