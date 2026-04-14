@@ -476,13 +476,17 @@ function initializeFestivalCardReveal() {
 
     if (reduceMotion) {
         cards.forEach(function (card) {
-            card.classList.add('is-revealed');
+            card.style.opacity = '1';
+            card.style.transform = 'none';
+            card.style.filter = 'none';
+            card.style.pointerEvents = '';
+            card.dataset.revealed = 'true';
         });
         return;
     }
 
     cards.forEach(function (card) {
-        card.classList.remove('is-revealed');
+        prepareCardForReveal(card);
     });
 
     festivalCardObserver = new IntersectionObserver(
@@ -494,17 +498,14 @@ function initializeFestivalCardReveal() {
                 const allCards = Array.from(list.querySelectorAll('.festival-card, .dreamy-festival-card'));
                 const index = allCards.indexOf(card);
 
-                setTimeout(function () {
-                    card.classList.add('is-revealed');
-                }, (index % 4) * 90);
-
+                revealCard(card, (index % 4) * 90);
                 obs.unobserve(card);
             });
         },
         {
             root: null,
-            threshold: 0.35,
-            rootMargin: '0px 0px -5% 0px'
+            threshold: 0.18,
+            rootMargin: '0px 0px -8% 0px'
         }
     );
 
