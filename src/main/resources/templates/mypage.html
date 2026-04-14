@@ -32,7 +32,7 @@
             <a href="/exhibition">전시행사</a>
         </nav>
         <div class="footer">
-            <img src="/images/banner2.png" alt="변화의 중심, 기회의 경기">
+            <img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
         </div>
     </aside>
 
@@ -114,7 +114,7 @@
             <div th:each="event : ${favoriteEvents}" class="event-card">
                 <a class="event-link" th:href="@{/festival/{title}(title=${event.title})}">
                     <img class="event-thumb"
-                         th:src="${event.imageUrl != null && !#strings.isEmpty(event.imageUrl) ? event.imageUrl : '/images/banner2.png'}"
+                         th:src="${event.imageUrl != null && !#strings.isEmpty(event.imageUrl) ? event.imageUrl : '/images/banner.png'}"
                          alt="행사 이미지">
                     <div class="event-info">
                         <span class="event-chip">FESTIVAL</span>

@@ -31,7 +31,7 @@
             <a href="/exhibition">전시행사</a>
         </nav>
         <div class="footer">
-            <img src="/images/banner2.png" alt="변화의 중심, 기회의 경기">
+            <img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
         </div>
     </aside>
 
@@ -141,7 +141,7 @@
 
             <div class="festival-info dreamy-festival-info">
                 <div class="image-container dreamy-image-container">
-                    <img th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner2.png'}" alt="축제 이미지">
+                    <img th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}" alt="축제 이미지">
                     <span class="star-icon" th:data-event-id="${festivalIdMap[festival.title]}">&#9733;</span>
                 </div>
 
