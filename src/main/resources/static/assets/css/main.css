@@ -800,26 +800,6 @@
     transform: rotate(-4deg);
 }
 
-.hero-card-back,
-.hero-card-front {
-    position: absolute;
-    border-radius: 32px;
-    background: rgba(255,255,255,0.22);
-    border: 1px solid rgba(255,255,255,0.35);
-    backdrop-filter: blur(16px);
-}
-
-.hero-card-back {
-    width: 420px;
-    height: 230px;
-    left: 100px;
-}
-
-.hero-card-front {
-    width: 420px;
-    height: 230px;
-    right: 85px;
-}
 
 .hero-visual img {
     position: relative;
@@ -2339,8 +2319,6 @@ body.event-page {
 .dreamy-festival-card,
 .home-info-panels .info-panel,
 .result-card,
-.faq-card,
-.notice-card,
 .search-panel {
     transition:
         transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -2356,8 +2334,6 @@ body.event-page {
 .category-card:hover,
 .dreamy-festival-card:hover,
 .result-card:hover,
-.faq-card:hover,
-.notice-card:hover,
 .home-info-panels .info-panel:hover {
     transform: translateY(-8px) scale(1.01);
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.10);
@@ -2453,8 +2429,6 @@ a {
     .dreamy-festival-card,
     .home-info-panels .info-panel,
     .result-card,
-    .faq-card,
-    .notice-card,
     .search-panel,
     .event-search-panel,
     .hero-btn,

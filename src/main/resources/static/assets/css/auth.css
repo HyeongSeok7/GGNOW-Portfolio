@@ -5,12 +5,6 @@ body.auth-page {
         linear-gradient(180deg, #f8f6ff 0%, #f7fbff 48%, #fffdf8 100%);
 }
 
-.auth-shell {
-    margin-left: 200px;
-    min-height: 100vh;
-    padding: 18px 22px 28px;
-}
-
 .auth-hero {
     position: relative;
     display: grid;
@@ -338,10 +332,6 @@ body.auth-page {
 }
 
 @media (max-width: 900px) {
-    .auth-shell {
-        margin-left: 0;
-        padding: 14px 14px 22px;
-    }
 
     .sidebar {
         position: static;

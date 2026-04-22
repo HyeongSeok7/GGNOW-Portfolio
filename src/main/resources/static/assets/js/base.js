@@ -458,13 +458,6 @@ function revealCard(card, delay) {
 }
 
 
-function revealCardsSequentially(cards, step) {
-    cards.forEach(function (card, index) {
-        revealCard(card, index * step);
-    });
-}
-
-
 function initializeFestivalCardReveal() {
     const list = document.getElementById('eventList');
     if (!list) return;
