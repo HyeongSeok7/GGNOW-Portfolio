@@ -1,8 +1,8 @@
 package com.project.web.controller;
 
 import com.project.web.model.FestivalResponse;
-import com.project.web.service.FestivalService;  // FestivalService 임포트 추가
-
+import com.project.web.service.FestivalIdentityService;
+import com.project.web.service.FestivalService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,20 +14,27 @@ import java.util.List;
 public class SearchController {
 
     private final FestivalService festivalService;
+    private final FestivalIdentityService festivalIdentityService;
 
-    public SearchController(FestivalService festivalService) {
+    public SearchController(FestivalService festivalService,
+                            FestivalIdentityService festivalIdentityService) {
         this.festivalService = festivalService;
+        this.festivalIdentityService = festivalIdentityService;
     }
 
-    @GetMapping("/search")  //HTTP GET 요청을 "/search" URL에 매핑
+    @GetMapping("/search")
     public String searchFestivals(@RequestParam("keyword") String keyword, Model model) {
-        //FestivalService를 사용해 검색 키워드에 해당하는 축제 데이터를 필터링 하여 가져온다
-        List<FestivalResponse.Row> filterFestivals = festivalService.searchFestivals(keyword);  // 반환 타입 수정
+        List<FestivalResponse.Row> filterFestivals = festivalService.searchFestivals(keyword);
 
-        //검색 결과 데이터를 모델에 추가
-        model.addAttribute("festivalData", filterFestivals);  // "festivalData"라는 이름으로 필터링된 데이터를 뷰에 전달
+        filterFestivals.forEach(festival -> {
+            Long festivalId = festivalIdentityService.getOrCreateFestivalId(
+                    festivalService.normalize(festival.getTitle()),
+                    festival.getTitle()
+            );
+            festival.setFestivalId(festivalId);
+        });
 
-        //"searchlist"라는 뷰 이름을 반환하여 해당 뷰를 렌더링
-        return "searchlist";    //클라이언트에게 "searchlist.html" 페이지를 렌더링 하도록 지정
+        model.addAttribute("festivalData", filterFestivals);
+        return "searchlist";
     }
 }

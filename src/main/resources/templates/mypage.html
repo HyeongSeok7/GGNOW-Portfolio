@@ -112,7 +112,7 @@
             </div>
 
             <div th:each="event : ${favoriteEvents}" class="event-card">
-                <a class="event-link" th:href="@{/festival/{title}(title=${event.title})}">
+                <a class="event-link" th:href="@{/festival/id/{festivalId}(festivalId=${event.festivalId})}">
                     <img class="event-thumb"
                          th:src="${event.imageUrl != null && !#strings.isEmpty(event.imageUrl) ? event.imageUrl : '/images/banner.png'}"
                          alt="행사 이미지">

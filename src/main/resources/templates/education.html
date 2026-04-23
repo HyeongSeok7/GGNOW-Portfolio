@@ -143,7 +143,7 @@
             <div class="festival-info dreamy-festival-info">
                 <div class="image-container dreamy-image-container">
                     <img th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}" alt="축제 이미지">
-                    <span class="star-icon" th:data-event-id="${festivalIdMap[festival.title]}">&#9733;</span>
+                    <span class="star-icon" th:data-event-id="${festival.festivalId}">&#9733;</span>
                 </div>
 
                 <div class="dreamy-card-body">
@@ -176,7 +176,7 @@
                         <strong>참가비</strong> 공식홈페이지 참고
                     </p>
 
-                    <a th:href="@{/festival/{title}(title=${festival.title})}" class="dreamy-detail-btn">상세 보기</a>
+                    <a th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}" class="dreamy-detail-btn">상세 보기</a>
                 </div>
             </div>
         </div>

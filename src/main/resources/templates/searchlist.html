@@ -104,7 +104,7 @@
             </div>
 
             <div class="result-body">
-                <a th:href="@{/festival/{title}(title=${festival.title})}" class="result-title-link">
+                <a th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}" class="result-title-link">
                     <h3 th:text="${festival.title}">Festival Title</h3>
                 </a>
 
@@ -127,7 +127,7 @@
                 </div>
 
                 <div class="result-actions">
-                    <a th:href="@{/festival/{title}(title=${festival.title})}" class="result-detail-btn">상세 보기</a>
+                    <a th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}" class="result-detail-btn">상세 보기</a>
                 </div>
             </div>
         </li>
