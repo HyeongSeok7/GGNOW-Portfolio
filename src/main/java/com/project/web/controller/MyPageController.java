@@ -57,7 +57,7 @@ public class MyPageController {
         model.addAttribute("user", user);       // 사용자 정보를 모델에 추가하여 뷰로 전달
 
         //사용자의 즐겨찾기 이벤트 조회
-        List<FavoriteEvent> favoriteEvents = favoriteEventRepository.findByUsername(username);  //사용자의 즐겨찾기 이벤트를 데이터베이스에서 조회
+        List<FavoriteEvent> favoriteEvents = favoriteEventRepository.findAllByUsername(username);  //사용자의 즐겨찾기 이벤트를 데이터베이스에서 조회
 
         //즐겨찾기 이벤트의 ID 목록 추출
         List<String> favoriteEventIds = favoriteEvents.stream()
@@ -69,10 +69,11 @@ public class MyPageController {
                 .getRow()
                 .stream()
                 .map(event -> {
-                    Long festivalId = festivalIdentityService.getOrCreateFestivalId(
-                            festivalService.normalize(event.getTitle()),
-                            event.getTitle()
-                    );
+                	Long festivalId = festivalIdentityService.getOrCreateFestivalId(
+                	        festivalService.createFestivalIdentityKey(event),
+                	        festivalService.normalize(event.getTitle()),
+                	        event.getTitle()
+                	);
                     event.setFestivalId(festivalId);
 
                     String fidKey = String.valueOf(festivalId);

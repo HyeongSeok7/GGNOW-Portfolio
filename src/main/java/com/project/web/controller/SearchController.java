@@ -28,6 +28,7 @@ public class SearchController {
 
         filterFestivals.forEach(festival -> {
             Long festivalId = festivalIdentityService.getOrCreateFestivalId(
+                    festivalService.createFestivalIdentityKey(festival),
                     festivalService.normalize(festival.getTitle()),
                     festival.getTitle()
             );

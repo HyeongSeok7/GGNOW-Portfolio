@@ -57,10 +57,11 @@ public class PageMoveController {
         }
 
         festivalResponse.getRow().forEach(row -> {
-            Long festivalId = festivalIdentityService.getOrCreateFestivalId(
-                    festivalService.normalize(row.getTitle()),
-                    row.getTitle()
-            );
+        	Long festivalId = festivalIdentityService.getOrCreateFestivalId(
+        	        festivalService.createFestivalIdentityKey(row),
+        	        festivalService.normalize(row.getTitle()),
+        	        row.getTitle()
+        	);
             row.setFestivalId(festivalId);
         });
     }

@@ -19,14 +19,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 public class FestivalController {
 
+	private static final Logger log = LoggerFactory.getLogger(FestivalController.class);
+	
     private final FavoriteEventRepository favoriteEventRepository;
     private final FestivalIdentityService festivalIdentityService;
     private final FestivalService festivalService;
     private final FestivalRepository festivalRepository;
 
+    
     public FestivalController(FavoriteEventRepository favoriteEventRepository,
                               FestivalIdentityService festivalIdentityService,
                               FestivalService festivalService,
@@ -49,18 +55,19 @@ public class FestivalController {
             String decodedTitle = URLDecoder.decode(title, StandardCharsets.UTF_8.name());
             String normalizedTitle = festivalService.normalize(decodedTitle);
 
-            FestivalResponse.Row festival = festivalService.getFestivalByTitle(normalizedTitle);
-            if (festival == null) {
-                throw new IllegalArgumentException("Festival not found for title: " + normalizedTitle);
-            }
+            FestivalResponse.Row festival = festivalService.getFestivalByNormalizedTitle(normalizedTitle);
+
+            String identityKey = festivalService.createFestivalIdentityKey(festival);
 
             Long festivalId = festivalIdentityService.getOrCreateFestivalId(
-                    normalizedTitle,
+                    identityKey,
+                    festivalService.normalize(festival.getTitle()),
                     festival.getTitle()
             );
 
             return "redirect:/festival/id/" + festivalId;
         } catch (Exception e) {
+            log.error("Festival detail redirect failed. title={}", title, e);
             return "errorpage";
         }
     }
@@ -74,10 +81,12 @@ public class FestivalController {
             FestivalEntity entity = festivalRepository.findById(festivalId)
                     .orElseThrow(() -> new IllegalArgumentException("Festival not found id=" + festivalId));
 
-            FestivalResponse.Row festival = festivalService.getFestivalByTitle(entity.getTitle());
-            if (festival == null) {
-                throw new IllegalArgumentException("Festival not found by title: " + entity.getTitle());
-            }
+            FestivalResponse.Row festival = festivalService.getFestivalData().getRow().stream()
+                    .filter(row -> festivalService.createFestivalIdentityKey(row).equals(entity.getIdentityKey()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Festival not found by identityKey: " + entity.getIdentityKey()
+                    ));
 
             model.addAttribute("festivalId", festivalId);
             model.addAttribute("festival", festival);
@@ -85,6 +94,7 @@ public class FestivalController {
 
             return "festivalDetail";
         } catch (Exception e) {
+            log.error("Festival detail page failed. festivalId={}", festivalId, e);
             return "errorpage";
         }
     }

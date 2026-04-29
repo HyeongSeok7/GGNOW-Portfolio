@@ -1,6 +1,5 @@
 package com.project.web.service;
 
-
 import com.project.web.model.FestivalEntity;
 import com.project.web.repository.FestivalRepository;
 import org.springframework.stereotype.Service;
@@ -16,14 +15,15 @@ public class FestivalIdentityService {
     }
 
     @Transactional
-    public Long getOrCreateFestivalId(String normalizedTitle, String originalTitle) {
-        return festivalRepository.findByNormalizedTitle(normalizedTitle)
+    public Long getOrCreateFestivalId(String identityKey, String normalizedTitle, String originalTitle) {
+        return festivalRepository.findByIdentityKey(identityKey)
                 .map(FestivalEntity::getId)
                 .orElseGet(() -> {
-                    FestivalEntity f = new FestivalEntity();
-                    f.setNormalizedTitle(normalizedTitle);
-                    f.setTitle(originalTitle);
-                    return festivalRepository.save(f).getId();
+                    FestivalEntity festival = new FestivalEntity();
+                    festival.setIdentityKey(identityKey);
+                    festival.setNormalizedTitle(normalizedTitle);
+                    festival.setTitle(originalTitle);
+                    return festivalRepository.save(festival).getId();
                 });
     }
 }

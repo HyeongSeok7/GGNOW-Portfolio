@@ -68,7 +68,6 @@ public class FestivalService {
 
             return festivalResponse;
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             FestivalResponse empty = new FestivalResponse();
             empty.setRow(List.of());
             return empty;
@@ -77,38 +76,47 @@ public class FestivalService {
 
     // 검색 메서드: 제목, 기관명 을 기준으로 검색
     public List<FestivalResponse.Row> searchFestivals(String keyword) {
-        // 축제 데이터를 가져옴
         FestivalResponse festivalResponse = getFestivalData();
 
-        // 축제 데이터가 null이거나, 데이터 안의 축제 리스트가
-        if (festivalResponse == null || festivalResponse.getAllFestivals() == null) {
-            return List.of(); // null 또는 데이터가 없는 경우 빈 리스트 반환
+        if (festivalResponse == null || festivalResponse.getRow() == null) {
+            return List.of();
         }
 
-        // 축제 리스트를 스트림으로 처리하여 조건에 맞는 데이터를 필터링
-        return festivalResponse.getAllFestivals().stream()
+        String normalizedKeyword = normalize(keyword);
+
+        if (normalizedKeyword.isBlank()) {
+            return List.of();
+        }
+
+        return festivalResponse.getRow().stream()
                 .filter(festival ->
-                        // 축제 제목이 null 이 아니고, 제목에 키워드가 포함된 경우
-                        (festival.getTitle() != null && festival.getTitle().contains(keyword)) ||
-                        // 축제 기관명이 null이 아니고, 기관명에 키워드가 포함된 경우
-                                (festival.getInstNm() != null && festival.getInstNm().contains(keyword)))
-                //조건에 맞는 축제를 리스트로 반환
+                        normalize(festival.getTitle()).contains(normalizedKeyword) ||
+                        normalize(festival.getInstNm()).contains(normalizedKeyword) ||
+                        normalize(festival.getAddr()).contains(normalizedKeyword)
+                )
                 .collect(Collectors.toList());
     }
 
 
     // 상세페이지 (더 알아보기) 설정
+ // 원본 제목이든 정규화된 제목이든 받아서 조회할 수 있게 유지
     public FestivalResponse.Row getFestivalByTitle(String title) {
-        // 입력된 제목을 표준화 (예: 대소문자 구분 제거)
-        String normalizedTitle = normalize(title);
+        return getFestivalByNormalizedTitle(normalize(title));
+    }
 
-        // 축제 데이터를 가져오고, 스트림으로 필터링
+    // 정규화된 제목으로 조회할 때 사용하는 명확한 메서드
+    public FestivalResponse.Row getFestivalByNormalizedTitle(String normalizedTitle) {
         return getFestivalData().getRow().stream()
-                 // 축제의 표준화된 제목과 입력된 표준화된 제목을 비교하여 필터링
                 .filter(festival -> normalize(festival.getTitle()).equals(normalizedTitle))
-                // 첫 번쨰로 일치하는 축제를 반환, 없으면 예외를 발생
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Festival not found for title: " + title));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Festival not found for normalizedTitle: " + normalizedTitle
+                ));
+    }
+
+    // FestivalEntity의 identityKey로 사용할 공개 메서드
+    public String createFestivalIdentityKey(FestivalResponse.Row festival) {
+        return fingerprint(festival);
     }
 
     // 문자열을 표준화 하는 메소드

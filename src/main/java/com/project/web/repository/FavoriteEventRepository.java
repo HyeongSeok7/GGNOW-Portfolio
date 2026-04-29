@@ -10,9 +10,6 @@ import java.util.List;
 
 @Repository
 public interface FavoriteEventRepository extends JpaRepository<FavoriteEvent, Long> {
-
-    List<FavoriteEvent> findByUsername(String username);
-
     List<FavoriteEvent> findAllByUsername(String username);
 
     @Transactional
