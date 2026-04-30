@@ -17,7 +17,7 @@ public class FestivalEntity {
     private Long id;
 
     // 제목 + 날짜 + 시간 + 장소 + 참가비 등을 조합한 내부 식별 키
-    @Column(name = "identity_key", nullable = false, length = 1000)
+    @Column(name = "identity_key", nullable = false, length = 64)
     private String identityKey;
 
     @Column(name = "normalized_title", nullable = false)

@@ -2,7 +2,6 @@ package com.project.web.service;
 
 import com.project.web.model.FestivalEntity;
 import com.project.web.repository.FestivalRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,24 +16,12 @@ public class FestivalIdentityService {
 
     @Transactional
     public Long getOrCreateFestivalId(String identityKey, String normalizedTitle, String originalTitle) {
+        festivalRepository.insertIgnore(identityKey, normalizedTitle, originalTitle);
+
         return festivalRepository.findByIdentityKey(identityKey)
                 .map(FestivalEntity::getId)
-                .orElseGet(() -> saveOrFindExisting(identityKey, normalizedTitle, originalTitle));
-    }
-
-    private Long saveOrFindExisting(String identityKey, String normalizedTitle, String originalTitle) {
-        try {
-            FestivalEntity festival = new FestivalEntity();
-            festival.setIdentityKey(identityKey);
-            festival.setNormalizedTitle(normalizedTitle);
-            festival.setTitle(originalTitle);
-
-            return festivalRepository.saveAndFlush(festival).getId();
-
-        } catch (DataIntegrityViolationException e) {
-            return festivalRepository.findByIdentityKey(identityKey)
-                    .map(FestivalEntity::getId)
-                    .orElseThrow(() -> e);
-        }
+                .orElseThrow(() -> new IllegalStateException(
+                        "Festival 저장 또는 조회 실패: " + identityKey
+                ));
     }
 }

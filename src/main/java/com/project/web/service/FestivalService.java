@@ -1,6 +1,5 @@
 package com.project.web.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.project.web.model.FestivalResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +11,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class FestivalService {
@@ -122,7 +125,8 @@ public class FestivalService {
 
     // FestivalEntity의 identityKey로 사용할 공개 메서드
     public String createFestivalIdentityKey(FestivalResponse.Row festival) {
-        return fingerprint(festival);
+        String rawKey = fingerprint(festival);
+        return sha256(rawKey);
     }
 
     // 문자열을 표준화 하는 메소드
@@ -231,4 +235,24 @@ public class FestivalService {
         return v.toLowerCase().replaceAll("\\s+", " ").trim();
     }
 
+    private String sha256(String value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
+        }
+    }
 }
