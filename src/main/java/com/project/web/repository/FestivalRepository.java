@@ -8,6 +8,4 @@ import java.util.Optional;
 public interface FestivalRepository extends JpaRepository<FestivalEntity, Long> {
 
     Optional<FestivalEntity> findByIdentityKey(String identityKey);
-
-    Optional<FestivalEntity> findByNormalizedTitle(String normalizedTitle);
 }
