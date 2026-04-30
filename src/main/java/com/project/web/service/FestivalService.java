@@ -37,27 +37,26 @@ public class FestivalService {
 
     @Cacheable(value = "festivals", key = "'all'")
     public FestivalResponse getFestivalData() {
-        String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                .queryParam("KEY", apiKey)
-                .queryParam("pIndex", pageIndex)
-                .queryParam("pSize", pageSize)
-                .build(true)
-                .toUriString();
-
-        String response = restTemplate.getForObject(url, String.class);
-
-        XmlMapper xmlMapper = new XmlMapper();
         try {
+            String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
+                    .queryParam("KEY", apiKey)
+                    .queryParam("pIndex", pageIndex)
+                    .queryParam("pSize", pageSize)
+                    .build(true)
+                    .toUriString();
+
+            String response = restTemplate.getForObject(url, String.class);
+
+            XmlMapper xmlMapper = new XmlMapper();
             FestivalResponse festivalResponse = xmlMapper.readValue(response, FestivalResponse.class);
 
             if (festivalResponse != null && festivalResponse.getAllFestivals() != null) {
-                // 제목을 기준으로 중복 제거된 리스트 생성
                 List<FestivalResponse.Row> distinctFestivals = festivalResponse.getAllFestivals().stream()
                         .collect(Collectors.toMap(
-                                this::fingerprint,          //  지문키로 중복 판단
+                                this::fingerprint,
                                 Function.identity(),
-                                this::chooseBetter,         //  중복이면 더 “좋은” 데이터 선택
-                                java.util.LinkedHashMap::new //  원래 순서 유지
+                                this::chooseBetter,
+                                java.util.LinkedHashMap::new
                         ))
                         .values()
                         .stream()
@@ -66,8 +65,15 @@ public class FestivalService {
                 festivalResponse.setRow(distinctFestivals);
             }
 
+            if (festivalResponse == null) {
+                FestivalResponse empty = new FestivalResponse();
+                empty.setRow(List.of());
+                return empty;
+            }
+
             return festivalResponse;
-        } catch (JsonProcessingException e) {
+
+        } catch (Exception e) {
             FestivalResponse empty = new FestivalResponse();
             empty.setRow(List.of());
             return empty;
