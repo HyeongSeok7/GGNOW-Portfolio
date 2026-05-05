@@ -68,7 +68,7 @@ public class FestivalController {
             return "redirect:/festival/id/" + festivalId;
         } catch (Exception e) {
             log.error("Festival detail redirect failed. title={}", title, e);
-            return "errorpage";
+            return "error";
         }
     }
 
@@ -95,7 +95,7 @@ public class FestivalController {
             return "festivalDetail";
         } catch (Exception e) {
             log.error("Festival detail page failed. festivalId={}", festivalId, e);
-            return "errorpage";
+            return "error";
         }
     }
 

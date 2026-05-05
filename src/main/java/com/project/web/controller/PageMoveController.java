@@ -73,6 +73,6 @@ public class PageMoveController {
 
     @GetMapping("/suggestions")
     public String suggestionsNotReady() {
-        return "errorpage";
+        return "error";
     }
 }

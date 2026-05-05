@@ -28,12 +28,14 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void registerUser(String username, String password, String email) {
-        String normalizedUsername = normalizeRequired(username, "아이디를 입력해주세요.");
-        String normalizedEmail = normalizeRequired(email, "이메일을 입력해주세요.").toLowerCase();
+    	String normalizedUsername = normalizeRequired(username, "아이디를 입력해주세요.");
+    	validateUsernameOrThrow(normalizedUsername);
 
-        if (userRepository.existsByUsername(normalizedUsername)) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
-        }
+    	String normalizedEmail = normalizeRequired(email, "이메일을 입력해주세요.").toLowerCase();
+
+    	if (userRepository.existsByUsername(normalizedUsername)) {
+    	    throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+    	}
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
@@ -93,7 +95,14 @@ public class UserService implements UserDetailsService {
 
     public boolean isUsernameAvailable(String username) {
         String normalizedUsername = username == null ? "" : username.trim();
-        return !normalizedUsername.isEmpty() && !userRepository.existsByUsername(normalizedUsername);
+
+        try {
+            validateUsernameOrThrow(normalizedUsername);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+
+        return !userRepository.existsByUsername(normalizedUsername);
     }
 
     private static final Pattern PASSWORD_RULE =
@@ -115,5 +124,16 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException(message);
         }
         return value.trim();
+    }
+    
+    private void validateUsernameOrThrow(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("아이디를 입력해주세요.");
+        }
+
+        String u = username.trim();
+        if (u.length() < 5 || u.length() > 20) {
+            throw new IllegalArgumentException("아이디는 5~20자 사이로 입력해주세요.");
+        }
     }
 }

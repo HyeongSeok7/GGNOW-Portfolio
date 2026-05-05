@@ -53,7 +53,7 @@
 
 ### Infra / Deploy
 - Railway
-- aiven
+- Aiven
 - Render
 - Docker
 
@@ -76,12 +76,13 @@
 ### 3. 행사 상세 조회
 - 행사 목록 및 검색 결과에서 선택한 행사 상세 페이지로 이동할 수 있습니다.
 - 초기에는 행사 제목을 URL 식별자로 사용했지만, 특수문자나 동일 제목 행사 문제로 인해 내부 식별자인 `festivalId` 기반 상세 조회 구조로 변경했습니다.
-- `festivalId`는 외부 API 데이터의 제목만으로 생성하지 않고, **제목 / 시작일 / 종료일 / 시간 / 주소 / 참가비**를 조합한 `identityKey`를 기준으로 생성합니다.
+- `festivalId`는 외부 API 데이터의 제목만으로 생성하지 않고, **제목 / 시작일 / 종료일 / 시간 / 주소 / 참가비**를 조합한 fingerprint를 SHA-256으로 변환한 `identityKey`를 기준으로 생성합니다.
 - 이를 통해 같은 제목의 다른 행사도 서로 다른 행사로 구분할 수 있으며, 리뷰와 즐겨찾기 기능을 더 안정적으로 연결할 수 있습니다.
 
 ### 4. 회원가입 / 로그인
-- 회원가입 시 **아이디 중복 확인** 기능을 제공합니다.
+- 회원가입 시 **아이디 5~20자 길이 검증**과 **아이디 중복 확인** 기능을 제공합니다.
 - Spring Security 기반 로그인 / 로그아웃을 구현했습니다.
+- 비밀번호는 **6~12자, 영문과 숫자 각각 1개 이상 포함** 규칙을 적용했습니다.
 - 비밀번호는 **BCrypt**로 암호화하여 저장했습니다.
 
 ### 5. 즐겨찾기
@@ -119,7 +120,7 @@
 
 ### 인증 / 회원
 - `POST /register` : 회원가입 처리
-- `GET /register/check-username?username={username}` : 아이디 중복 확인
+- `GET /register/check-username?username={username}` : 아이디 길이 검증 및 중복 확인
 - `GET /check-login` : 로그인 상태 확인
 
 ### 리뷰 API
@@ -197,9 +198,11 @@ src
 - **User** : 회원 정보 관리
 - **Review** : 행사별 리뷰 저장
 - **FavoriteEvent** : 회원별 즐겨찾기 행사 저장
+- 현재 구현에서는 `event_id` 컬럼에 내부 행사 식별자인 `festival.id` 값을 문자열 형태로 저장합니다.
+- 따라서 ERD에서는 `favorite_event.event_id`와 `festival.id`를 실제 FK가 아닌 논리적 참조 관계로 설명합니다.
 - **FestivalEntity** : 외부 API 행사 데이터를 내부 기능과 연결하기 위한 식별 엔티티
   - `id` : 서비스 내부에서 사용하는 행사 식별자
-  - `identityKey` : 제목 / 날짜 / 시간 / 주소 / 참가비를 조합한 행사 식별 키
+  - `identityKey` : 행사 정보를 조합한 fingerprint를 SHA-256으로 변환한 내부 행사 식별 키
   - `normalizedTitle` : 검색 및 비교를 위해 정규화한 행사 제목
   - `title` : 화면 표시용 원본 행사 제목
 
@@ -221,7 +224,8 @@ src
 ### 3. 외부 행사 데이터와 내부 식별자 분리
 - 외부 API 행사 데이터에는 서비스 내부에서 그대로 사용할 수 있는 고정 PK가 없었습니다.
 - 초기에는 정규화된 행사 제목을 기준으로 내부 `festivalId`를 생성했지만, 같은 제목의 다른 행사가 존재할 경우 리뷰와 즐겨찾기가 잘못 연결될 수 있다는 한계가 있었습니다.
-- 이를 개선하기 위해 `FestivalEntity`에 `identityKey`를 추가하고, **제목 / 시작일 / 종료일 / 시간 / 주소 / 참가비**를 조합한 값을 내부 식별 기준으로 사용했습니다.
+- 이를 개선하기 위해 `FestivalEntity`에 `identityKey`를 추가하고, **제목 / 시작일 / 종료일 / 시간 / 주소 / 참가비**를 조합한 fingerprint를 SHA-256으로 변환해 내부 식별 기준으로 사용했습니다.  
+이를 통해 긴 한글 문자열을 unique key로 직접 저장할 때 발생할 수 있는 인덱스 길이 문제를 피하고, 항상 64자리 고정 길이 식별자를 사용할 수 있도록 개선했습니다.
 - 사용자가 행사 목록, 검색 결과, 마이페이지에서 상세 페이지로 이동할 때 모두 내부 `festivalId`를 사용하도록 구성했습니다.
 - 결과적으로 외부 API의 문자열 데이터와 서비스 내부 식별자를 분리하여, 리뷰 / 즐겨찾기 / 상세 페이지 연결의 안정성을 높였습니다.
 
@@ -259,7 +263,7 @@ src
 
 #### 해결
 - `FestivalEntity`에 `identityKey` 컬럼을 추가했습니다.
-- `identityKey`는 행사 제목만 사용하지 않고, **제목 / 시작일 / 종료일 / 시간 / 주소 / 참가비**를 조합해 생성했습니다.
+- `identityKey`는 행사 제목만 사용하지 않고, **제목 / 시작일 / 종료일 / 시간 / 주소 / 참가비**를 조합한 fingerprint를 SHA-256으로 변환해 생성했습니다.
 - `festivalId` 생성 시 기존의 `normalizedTitle` 기준 조회가 아니라 `identityKey` 기준 조회로 변경했습니다.
 - 행사 목록, 검색 결과, 마이페이지에서 상세 페이지로 이동할 때 모두 동일한 방식으로 `identityKey`를 생성하고, 해당 값에 매핑된 내부 `festivalId`를 사용하도록 수정했습니다.
 
@@ -312,16 +316,20 @@ src
 - 프론트엔드 동작 문제는 항상 코드 자체만의 문제가 아닐 수 있다는 점을 배웠습니다. 
 - 특히 애니메이션이나 인터랙션 기능은 사용자 환경 설정의 영향을 받을 수 있기 때문에, 디버깅 시 실행 환경까지 함께 고려하는 습관이 중요하다는 것을 깨달았습니다.
 
-### 6. 행사 식별 기준 변경 후 DB 제약조건 충돌 문제
+### 6. 배포 환경에서 기존 DB 데이터와 충돌한 문제
 
 #### 문제
-- 행사 식별 기준을 `normalizedTitle`에서 `identityKey`로 변경한 뒤, 카테고리 페이지 접속 시 500 에러가 발생했습니다.
-- 원인은 기존 DB에 남아 있던 `normalized_title` unique 제약조건이었습니다.
-- 코드에서는 같은 제목의 다른 행사도 저장할 수 있도록 `identityKey` 기준으로 변경했지만, DB에는 여전히 "같은 normalizedTitle은 저장할 수 없다"는 이전 제약조건이 남아 있었습니다.
+- 로컬에서는 정상적으로 동작했지만, Render 배포 환경에서 카테고리 페이지 접속 시 500 에러가 발생했습니다.
+- 로그를 확인해보니 Aiven DB의 기존 `festival` 테이블에 예전 방식의 긴 `identity_key` 데이터가 남아 있었고, 새 코드에서 `identity_key`를 64자리 해시값으로 변경하면서 충돌이 발생했습니다.
+- 또한 같은 행사를 거의 동시에 저장하려는 경우 `Duplicate entry` 오류가 발생할 수 있었습니다.
 
 #### 해결
-- 개발 환경에서는 기존 행사 관련 테이블을 초기화했습니다.
-- 이후 `FestivalEntity`의 unique 기준을 `identity_key`로 다시 생성하여, 같은 제목의 다른 행사도 날짜 / 시간 / 장소 / 참가비가 다르면 별도 행사로 저장될 수 있도록 수정했습니다.
+- `identityKey`를 긴 문자열 그대로 저장하지 않고, 행사 정보를 조합한 fingerprint를 SHA-256으로 변환해 저장하도록 수정했습니다.
+- `identity_key` 컬럼 길이를 64자로 변경하고, 중복 저장 시 예외가 발생하지 않도록 `INSERT IGNORE`를 적용했습니다.
+- Aiven DB에 남아 있던 기존 행사 관련 테이블을 삭제한 뒤, 새 스키마 기준으로 다시 생성했습니다.
+
+#### 배운 점
+- 배포 환경에서는 코드 수정만으로 문제가 해결되지 않을 수 있고, 기존 DB에 남아 있는 데이터와 제약조건까지 함께 확인해야 한다는 점을 배웠습니다.
 
 ---
 
@@ -331,7 +339,7 @@ src
 - 이번 프로젝트는 기능 구현과 배포 흐름을 우선으로 진행했으며, 주요 기능은 회원가입, 로그인, 상세 조회, 리뷰, 즐겨찾기, 마이페이지 중심으로 수동 검증했습니다.
 - 추후에는 핵심 서비스 로직부터 단위 테스트를 보완해 안정성을 높일 계획입니다.
 - 검색 기능은 제목 / 기관명 / 주소 기준으로 개선했지만, 아직 날짜 범위, 지역, 카테고리 등 세부 조건 기반 필터링은 부족합니다.
-- 현재 `Review`와 `FavoriteEvent`는 `festivalId`, `username` 값을 중심으로 연결하고 있어 기능 구현에는 문제가 없지만, 추후에는 JPA 연관관계를 더 명확하게 표현하도록 리팩토링하고 싶습니다.
+- 현재 `Review`와 `FavoriteEvent`는 `festivalId`, 로그인 아이디인 `username` 값을 중심으로 연결하고 있어 기능 구현에는 문제가 없지만, 추후에는 JPA 연관관계를 더 명확하게 표현하도록 리팩토링하고 싶습니다.
 
 ---
 
@@ -353,7 +361,7 @@ src
 프로젝트 실행을 위해 아래 환경 변수가 필요합니다.
 
 ```properties
-API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREVENTSTUS
+API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREEVENTSTUS
 API_KEY=your_api_key
 API_PAGE_INDEX=1
 API_PAGE_SIZE=200
@@ -367,16 +375,53 @@ PORT=8080
 
 ---
 
-## 로컬 실행 방법
+## 실행 방법
 
-```bash
-git clone https://github.com/HyeongSeok7/GGNOW-Portfolio.git
-cd GGNOW-Portfolio
-./gradlew bootRun
+현재 프로젝트는 배포 환경에서 바로 확인할 수 있습니다.
+
+- 배포 주소: https://ggnow-portfolio.onrender.com/main
+
+로컬에서 직접 실행하는 경우에는 MariaDB와 공공데이터 API Key 설정이  필요합니다.  
+실행에 필요한 주요 환경 변수는 다음과 같습니다.
+
+```properties
+API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREEVENTSTUS
+API_KEY=your_api_key
+API_PAGE_INDEX=1
+API_PAGE_SIZE=200
+
+DB_URL=jdbc:mariadb://localhost:3306/ggnow
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+
+PORT=8080
 ```
 
-또는 IDE에서 `WebApplication`을 실행하면 됩니다.
+**DB_URL**은 실행 방식에 따라 다르게 설정합니다.
+- 로컬에 설치된 MariaDB를 사용하는 경우 
+```properties
+DB_URL=jdbc:mariadb://localhost:3306/ggnow
+```
+- Docker Compose로 실행한 MariaDB를 사용하는 경우
+```properties
+DB_URL=jdbc:mariadb://localhost:3307/ggnow
+```
+### 로컬 실행
 
+
+Windows 환경에서 아래 명령어로 실행할 수 있습니다.
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+실행 후 아래 주소로 접속하면 메인 페이지를 확인할 수 있습니다.
+
+```text
+http://localhost:8080/main
+```
+
+자세한 실행 환경은 `application.properties`와 `docker-compose.yml` 설정을 기준으로 구성할 수 있습니다.
 ---
 
 ## 회고

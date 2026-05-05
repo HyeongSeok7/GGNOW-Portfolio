@@ -104,6 +104,12 @@ public class LoginController {
             return ResponseEntity.ok(body);
         }
 
+        if (u.length() < 5 || u.length() > 20) {
+            body.put("available", false);
+            body.put("message", "아이디는 5~20자 사이로 입력해주세요.");
+            return ResponseEntity.ok(body);
+        }
+
         boolean available = userService.isUsernameAvailable(u);
 
         // 서버에서 강제하기 위해 세션에 저장

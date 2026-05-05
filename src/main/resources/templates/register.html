@@ -81,7 +81,7 @@
                     <div class="form-group">
                         <label for="username">아이디</label>
                         <div class="inline-check-row">
-                            <input type="text" id="username" name="username" required th:value="${username}" placeholder="아이디를 입력하세요">
+                            <input type="text" id="username" name="username" required minlength="5" maxlength="20" th:value="${username}" placeholder="아이디를 입력하세요">
                             <button type="button" id="checkUsernameBtn" class="check-btn">중복확인</button>
                         </div>
                         <div class="auth-feedback small" id="username-check-msg" style="display:none;"></div>

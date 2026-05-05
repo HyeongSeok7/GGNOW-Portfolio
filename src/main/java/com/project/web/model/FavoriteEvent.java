@@ -18,7 +18,7 @@ public class FavoriteEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 20)
     private String username;
 
     @Column(name = "event_id", nullable = false, length = 255)

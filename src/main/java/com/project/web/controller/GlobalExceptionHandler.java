@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
 
         //에러페이지로 이동
         modelAndView.addObject("errorMessage", ex.getMessage());    // 예외 메시지를 errorMessage 라는 이름으로 추가
-        modelAndView.setViewName("errorpage");  //에러 처리용 뷰 이름을 errorpage로 설정
+        modelAndView.setViewName("error");  //에러 처리용 뷰 이름을 error페이지로 설정
         return modelAndView;        // 클라이언트에게 반환할 "ModelAndView" 객체
     }
 }
