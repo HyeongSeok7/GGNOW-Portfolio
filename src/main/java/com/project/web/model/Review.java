@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+//행사 리뷰를 저장하는 Entity
 @Entity
 public class Review {
     @Id

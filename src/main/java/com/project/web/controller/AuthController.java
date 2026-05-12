@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthController {
-
+	
+	// 현재 요청의 Spring Security 인증 정보를 확인하는 테스트/상태 확인용 API
+	// 프론트에서 로그인 여부를 확인할 때 사용
     @GetMapping("/check-login")
     public String checkLogin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

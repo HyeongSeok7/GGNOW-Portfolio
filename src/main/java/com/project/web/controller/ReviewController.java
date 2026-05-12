@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+//행사 상세 페이지에서 사용하는 리뷰 REST API 컨트롤러
+//리뷰 조회는 비회원도 가능하지만, 작성/수정/삭제는 로그인 사용자만 가능
 @RestController
 @RequestMapping("/festivals/{festivalId}/reviews")
 public class ReviewController {
@@ -23,11 +25,14 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    // 특정 행사에 작성된 리뷰 목록 조회
     @GetMapping
     public ResponseEntity<List<Review>> getReviews(@PathVariable("festivalId") Long festivalId) {
         return ResponseEntity.ok(reviewService.getReviewsByFestivalId(festivalId));
     }
 
+    // 로그인한 사용자가 특정 행사에 리뷰를 작성
+    // festivalId를 기준으로 어떤 행사에 작성된 리뷰인지 연결한다
     @PostMapping
     public ResponseEntity<Map<String, String>> addReview(
             @PathVariable("festivalId") Long festivalId,
@@ -47,7 +52,8 @@ public class ReviewController {
         return ResponseEntity.status(201).body(Map.of("message", "리뷰를 등록했습니다!"));
     }
 
-    // ✅ 리뷰 수정 (작성자만)
+    // 리뷰 내용 수정
+    // ReviewService에서 festivalId 일치 여부와 작성자 본인 여부를 검증
     @PatchMapping("/{reviewId}")
     public ResponseEntity<Map<String, String>> updateReview(
             @PathVariable Long festivalId,
@@ -77,7 +83,8 @@ public class ReviewController {
         }
     }
 
-    // ✅ 리뷰 삭제 (작성자만)
+    // 리뷰를 삭제
+    // ReviewService에서 작성자 본인인지 확인한 뒤 삭제
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Map<String, String>> deleteReview(
             @PathVariable("festivalId") Long festivalId,

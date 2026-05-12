@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.Map;
 
+//로그인 페이지, 회원가입 페이지, 아이디 중복 확인을 처리하는 컨트롤러
+//실제 로그인 인증은 Spring Security가 담당, 컨트롤러는 페이지 이동과 회원가입 요청을 담당!
 @Controller
 public class LoginController {
 
@@ -22,7 +24,8 @@ public class LoginController {
         this.userService = userService;
     }
 
-    // 로그인 페이지를 반환하고, 실패 또는 로그아웃 메시지 추가
+    // 로그인 페이지를 반환한다.
+    // 로그인 실패, 로그아웃, 회원가입 완료 여부를 query parameter로 받아 화면 메시지로 전달한다.
     @GetMapping("/login")
     public String moveLoginPage(@RequestParam(value = "error", required = false) String error,
                                 @RequestParam(value = "logout", required = false) String logout,
@@ -47,7 +50,9 @@ public class LoginController {
         return "register";
     }
 
-    // 회원가입 설정
+    // 회원가입 요청 처리
+    // 아이디 중복 확인 결과를 세션에 저장해두고,
+    // 사용자가 중복 확인한 아이디와 실제 가입 요청 아이디가 같은지 검증
     @PostMapping("/register")
     public String register(@RequestParam("username") String username,
                            @RequestParam("password") String password,
@@ -57,7 +62,8 @@ public class LoginController {
         try {
             String u = username == null ? "" : username.trim();
 
-            // 중복확인 강제: 세션에 저장된 값과 일치 + available=true 여야만 가입 가능
+            // 프론트에서만 중복 확인을 하면 우회될 수 있으므로,
+            // 서버 세션에 저장된 중복 확인 결과를 기준으로 최종 가입 가능 여부를 판단
             String checkedUsername = (String) session.getAttribute("checkedUsername");
             Boolean usernameAvailable = (Boolean) session.getAttribute("usernameAvailable");
 
@@ -71,9 +77,10 @@ public class LoginController {
                 throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
             }
 
+            // 아이디/이메일 중복, 비밀번호 규칙 검증, 비밀번호 암호화는 UserService에서 처리
             userService.registerUser(u, password, email);
 
-            // 가입 성공 후 세션 값 정리(선택)
+            // 가입 성공 후 세션 값 정리
             session.removeAttribute("checkedUsername");
             session.removeAttribute("usernameAvailable");
 

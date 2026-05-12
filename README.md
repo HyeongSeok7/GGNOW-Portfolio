@@ -361,7 +361,7 @@ src
 프로젝트 실행을 위해 아래 환경 변수가 필요합니다.
 
 ```properties
-API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREEVENTSTUS
+API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREVENTSTUS
 API_KEY=your_api_key
 API_PAGE_INDEX=1
 API_PAGE_SIZE=200
@@ -385,7 +385,7 @@ PORT=8080
 실행에 필요한 주요 환경 변수는 다음과 같습니다.
 
 ```properties
-API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREEVENTSTUS
+API_BASE_URL=https://openapi.gg.go.kr/GGCULTUREVENTSTUS
 API_KEY=your_api_key
 API_PAGE_INDEX=1
 API_PAGE_SIZE=200

@@ -2,6 +2,7 @@ package com.project.web.model;
 
 import jakarta.persistence.*;
 
+//외부 API 행사 데이터를 내부 기능과 연결하기 위한 식별 Entity
 @Entity
 @Table(
         name = "festival",
@@ -16,7 +17,7 @@ public class FestivalEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 제목 + 날짜 + 시간 + 장소 + 참가비 등을 조합한 내부 식별 키
+    // 제목, 날짜, 시간, 주소, 참가비 등을 조합한 fingerprint를 SHA-256으로 변환한 고유 키
     @Column(name = "identity_key", nullable = false, length = 64)
     private String identityKey;
 

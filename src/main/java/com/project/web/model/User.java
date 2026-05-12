@@ -3,6 +3,7 @@ package com.project.web.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+//회원 정보를 저장하는 JPA Entity
 @Entity
 @Table(
     name = "users",

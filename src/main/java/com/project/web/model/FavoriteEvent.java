@@ -2,6 +2,7 @@ package com.project.web.model;
 
 import jakarta.persistence.*;
 
+//사용자가 즐겨찾기한 행사를 저장하는 Entity
 @Entity
 @Table(
     name = "favorite_event",

@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+//즐겨찾기 Entity에 대한 DB 접근 레파지토리
+//사용자별 즐겨찾기 조회, 삭제, 중복 확인에 사용
 @Repository
 public interface FavoriteEventRepository extends JpaRepository<FavoriteEvent, Long> {
     List<FavoriteEvent> findAllByUsername(String username);

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+//마이페이지 관련 화면을 담당하는 컨트롤러
+//사용자 정보, 즐겨찾기 행사, 내가 작성한 리뷰, 비밀번호 변경 기능을 처리
 @Controller
 public class MyPageController {
 
@@ -48,6 +50,7 @@ public class MyPageController {
         this.festivalIdentityService = festivalIdentityService;
     }
 
+    // 로그인한 사용자의 기본 정보와 즐겨찾기 행사 목록을 조회해 마이페이지에 전달
     @GetMapping("/mypage")
     public String showMyPage(Model model, Principal principal) {
 
@@ -56,8 +59,9 @@ public class MyPageController {
         User user = userService.getUserByUsername(username);  //사용자 이름을 기반으로 사용자 정보를 가져온다
         model.addAttribute("user", user);       // 사용자 정보를 모델에 추가하여 뷰로 전달
 
-        //사용자의 즐겨찾기 이벤트 조회
-        List<FavoriteEvent> favoriteEvents = favoriteEventRepository.findAllByUsername(username);  //사용자의 즐겨찾기 이벤트를 데이터베이스에서 조회
+        // favorite_event 테이블에는 사용자가 저장한 행사 식별값만 있으므로,
+        // 외부 API 행사 목록과 다시 매칭해 화면에 표시할 상세 정보를 구성
+        List<FavoriteEvent> favoriteEvents = favoriteEventRepository.findAllByUsername(username); 
 
         //즐겨찾기 이벤트의 ID 목록 추출
         List<String> favoriteEventIds = favoriteEvents.stream()
@@ -69,6 +73,7 @@ public class MyPageController {
                 .getRow()
                 .stream()
                 .map(event -> {
+                	// 외부 API Row마다 내부 festivalId를 붙여 상세 페이지 이동과 즐겨찾기 비교에 사용
                 	Long festivalId = festivalIdentityService.getOrCreateFestivalId(
                 	        festivalService.createFestivalIdentityKey(event),
                 	        festivalService.normalize(event.getTitle()),
@@ -79,6 +84,8 @@ public class MyPageController {
                     String fidKey = String.valueOf(festivalId);
                     String favoriteId = null;
 
+                    // 현재 구조에서는 festivalId를 기준으로 즐겨찾기를 비교
+                    // 기존에 제목 기반으로 저장된 데이터가 있을 수 있어 title 비교도 보조적으로 유지
                     if (favoriteEventIds.contains(fidKey)) favoriteId = fidKey;
                     else if (favoriteEventIds.contains(event.getTitle())) favoriteId = event.getTitle();
 
@@ -95,6 +102,7 @@ public class MyPageController {
         return "mypage";
     }
 
+    // 현재 로그인한 사용자가 작성한 리뷰를 최신순으로 조회해 내 리뷰 페이지에 전달
     @GetMapping("/my-reviews")
     public String myReviews(Model model, Principal principal) {
         String username = principal.getName();
@@ -103,12 +111,15 @@ public class MyPageController {
     }
 
 
+    // 비밀번호 변경 폼을 보여주기 위해 빈 DTO 객체를 모델에 담아 전달
     @GetMapping("/change-password")
     public String showChangePasswordPage(Model model) {
         model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
         return "change-password";
     }
 
+    // 현재 비밀번호 확인 후 새 비밀번호로 변경
+    // 변경 성공 시 기존 세션을 로그아웃 처리해 다시 로그인하도록 한다
     @PostMapping("/change-password")
     public String changePasswordSubmit(
             @ModelAttribute("changePasswordRequest") ChangePasswordRequest form,
@@ -135,6 +146,7 @@ public class MyPageController {
             userService.changePassword(username, form.getCurrentPassword(), form.getNewPassword());
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            // 비밀번호 변경 후 기존 인증 세션을 종료
             if (auth != null) {
                 new SecurityContextLogoutHandler().logout(request, response, auth);
             }

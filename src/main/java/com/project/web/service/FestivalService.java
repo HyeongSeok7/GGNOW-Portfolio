@@ -16,9 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+//경기도 공공데이터 API에서 행사 데이터를 가져오고,
+//검색, 상세 조회, 중복 제거, 내부 식별키 생성을 담당하는 서비스
 @Service
 public class FestivalService {
 
+	// API 호출에 필요한 설정값은 application.properties 또는 배포 환경변수에서 주입!!
     @Value("${api.key}")
     private String apiKey;
 
@@ -38,9 +41,13 @@ public class FestivalService {
         this.restTemplate = restTemplate;
     }
 
+    // 외부 공공데이터 API에서 행사 XML 데이터를 조회해 Java 객체로 변환
+    // 동일한 요청이 반복되지 않도록 결과를 캐시에 저장하고,
+    // API 응답 내 중복 행사는 fingerprint 기준으로 제거
     @Cacheable(value = "festivals", key = "'all'")
     public FestivalResponse getFestivalData() {
         try {
+        	// API URL에 인증키, 페이지 번호, 페이지 크기를 query parameter로 추가
             String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
                     .queryParam("KEY", apiKey)
                     .queryParam("pIndex", pageIndex)
@@ -50,11 +57,14 @@ public class FestivalService {
 
             String response = restTemplate.getForObject(url, String.class);
 
+            // 공공데이터 API의 XML 응답을 FestivalResponse 객체로 매핑한다.
             XmlMapper xmlMapper = new XmlMapper();
             FestivalResponse festivalResponse = xmlMapper.readValue(response, FestivalResponse.class);
 
             if (festivalResponse != null && festivalResponse.getAllFestivals() != null) {
                 List<FestivalResponse.Row> distinctFestivals = festivalResponse.getAllFestivals().stream()
+                		// 같은 행사로 판단되는 Row를 fingerprint 기준으로 묶고,
+                		// 중복이 발생하면 더 적합한 데이터를 chooseBetter로 선택
                         .collect(Collectors.toMap(
                                 this::fingerprint,
                                 Function.identity(),
@@ -76,6 +86,7 @@ public class FestivalService {
 
             return festivalResponse;
 
+         // 외부 API 오류가 발생해도 서비스 전체가 중단되지 않도록 빈 응답을 반환
         } catch (Exception e) {
             FestivalResponse empty = new FestivalResponse();
             empty.setRow(List.of());
@@ -83,7 +94,8 @@ public class FestivalService {
         }
     }
 
-    // 검색 메서드: 제목, 기관명 을 기준으로 검색
+    // 검색어와 행사 데이터를 정규화한 뒤 제목, 기관명, 주소를 기준으로 검색
+    // 공백/특수문자 차이로 검색이 실패하지 않도록 normalize 결과를 비교
     public List<FestivalResponse.Row> searchFestivals(String keyword) {
         FestivalResponse festivalResponse = getFestivalData();
 
@@ -107,13 +119,13 @@ public class FestivalService {
     }
 
 
-    // 상세페이지 (더 알아보기) 설정
- // 원본 제목이든 정규화된 제목이든 받아서 조회할 수 있게 유지
+    // 원본 제목으로 들어온 상세 조회 요청을 정규화 제목 기반 조회로 변환
     public FestivalResponse.Row getFestivalByTitle(String title) {
         return getFestivalByNormalizedTitle(normalize(title));
     }
 
-    // 정규화된 제목으로 조회할 때 사용하는 명확한 메서드
+    // 정규화된 제목과 정확히 일치하는 행사를 찾고,
+    // 제목 기반 상세 URL을 festivalId 기반 URL로 변환할 때 사용
     public FestivalResponse.Row getFestivalByNormalizedTitle(String normalizedTitle) {
         return getFestivalData().getRow().stream()
                 .filter(festival -> normalize(festival.getTitle()).equals(normalizedTitle))
@@ -123,14 +135,15 @@ public class FestivalService {
                 ));
     }
 
-    // FestivalEntity의 identityKey로 사용할 공개 메서드
+    // 외부 API 행사 데이터를 내부 DB 식별자로 연결하기 위한 identityKey를 생성
+    // fingerprint를 SHA-256으로 변환해 festival 테이블의 고유 키로 사용
     public String createFestivalIdentityKey(FestivalResponse.Row festival) {
         String rawKey = fingerprint(festival);
         return sha256(rawKey);
     }
 
-    // 문자열을 표준화 하는 메소드
-    // 특정 문자만 남기고 제거 , 공백 제거, 소문자로 변환
+    // 검색과 제목 비교를 위해 문자열을 표준화
+    // 영문/숫자/한글 일부 특수문자만 남기고 공백 제거 및 소문자 변환을 수행
     public String normalize(String input) {
         // 입력 값이 null 이면 빈 문자열 ("") 를 반환
         if (input == null) return "";
@@ -143,7 +156,8 @@ public class FestivalService {
     }
 
 
-    // ✅ 같은 행사 판별용 "지문키" 생성
+    // 같은 행사인지 판단하기 위한 원본 키를 만들고,
+    // 제목만 사용하면 동명이 행사 문제가 생길 수 있어 날짜, 시간, 참가비, 주소까지 함께 사용
     private String fingerprint(FestivalResponse.Row r) {
         String title = canonicalTitle(r.getTitle());
         String begin = safe(r.getBeginDe());
@@ -156,7 +170,7 @@ public class FestivalService {
         return String.join("|", title, begin, end, time, fee, addr);
     }
 
-    // ✅ < > 《 》 같은 장식 + 뒤에 붙는 영문 부제 제거해서 "같은 제목"으로 통일
+    // 행사 제목 비교를 안정적으로 하기 위해 장식 문자와 영문 부제를 정리
     private String canonicalTitle(String raw) {
         if (raw == null) return "";
 
@@ -168,8 +182,7 @@ public class FestivalService {
         // 2) 구분 기호 정리
         t = t.replaceAll("[-–—:|·•]", " ");
 
-        // 3) "한국어 제목 + (뒤에 영문만 길게 붙는 경우)" → 영문부제 잘라내기
-        //    예) "사라지는 감각들 TRANSITS OF SENSES" → "사라지는 감각들"
+        // 제목 뒤에 붙은 영문 부제를 제거하기 위해 마지막 한글 위치를 찾는다
         int lastKo = lastIndexOfKorean(t);
         if (lastKo != -1 && lastKo < t.length() - 1) {
             String tail = t.substring(lastKo + 1); // 한국어 끝 이후 부분
@@ -194,9 +207,9 @@ public class FestivalService {
         return -1;
     }
 
-    // ✅ 중복일 때 어떤 Row를 남길지 결정
+    // 중복 행사 중 화면에 표시하기 더 좋은 Row를 선택
+    // 우선 제목이 더 깔끔한 데이터를 선택하고, 길이가 같으면 정보가 더 많은 데이터를 선택
     private FestivalResponse.Row chooseBetter(FestivalResponse.Row a, FestivalResponse.Row b) {
-        // 1) 제목이 더 "깔끔한"(짧은) 쪽 우선: 영문부제/장식 많은 쪽을 버리기 좋음
         String ca = canonicalTitle(a.getTitle());
         String cb = canonicalTitle(b.getTitle());
         if (!ca.equals(cb)) {
@@ -206,7 +219,7 @@ public class FestivalService {
         int lenB = b.getTitle() == null ? Integer.MAX_VALUE : b.getTitle().length();
         if (lenA != lenB) return (lenA < lenB) ? a : b;
 
-        // 2) 그 다음은 "정보가 더 많은" 쪽
+        // 이미지, 홈페이지, 주소, 시간 등 화면에 유용한 정보가 많을수록 높은 점수를 부여
         return score(b) > score(a) ? b : a;
     }
 
@@ -235,6 +248,8 @@ public class FestivalService {
         return v.toLowerCase().replaceAll("\\s+", " ").trim();
     }
 
+    // fingerprint 문자열을 고정 길이의 SHA-256 해시값으로 변환
+    // DB unique key로 사용하기 위해 길이와 형식을 일정하게 만든다
     private String sha256(String value) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

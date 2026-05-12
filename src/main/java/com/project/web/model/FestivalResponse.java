@@ -5,10 +5,13 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 import java.util.List;
 
+//경기도 공공데이터 API의 XML 응답을 매핑하기 위한 DTO
+//Jackson XmlMapper가 XML 태그명을 Java 필드에 매핑
 public class FestivalResponse {
 
     private Head head;
 
+    // XML 응답에서 row 태그가 별도 wrapper 없이 반복되므로 wrapping을 사용 X
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<Row> row;
 
@@ -91,6 +94,8 @@ public class FestivalResponse {
         }
     }
 
+    // API 응답의 개별 행사 정보를 나타낸다
+    // festivalId와 favoriteId는 API 원본 필드가 아니라 화면 표시와 내부 기능 연결을 위해 추가한 값이다
     public static class Row {
         @JsonProperty("ID")
         private String id;
