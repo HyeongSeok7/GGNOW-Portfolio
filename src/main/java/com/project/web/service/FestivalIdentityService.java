@@ -10,23 +10,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FestivalIdentityService {
 
-    private final FestivalRepository festivalRepository;
+	private final FestivalRepository festivalRepository;
 
-    public FestivalIdentityService(FestivalRepository festivalRepository) {
-        this.festivalRepository = festivalRepository;
-    }
+	public FestivalIdentityService(FestivalRepository festivalRepository) {
+		this.festivalRepository = festivalRepository;
+	}
 
-    // identityKey가 이미 존재하면 기존 festivalId를 반환하고,
-    // 없으면 insertIgnore로 새 행사 식별 정보를 저장한 뒤 festivalId를 조회
-    @Transactional
-    public Long getOrCreateFestivalId(String identityKey, String normalizedTitle, String originalTitle) {
-    	// 중복 요청이 동시에 들어와도 unique key와 INSERT IGNORE로 중복 저장을 방지
-    	festivalRepository.insertIgnore(identityKey, normalizedTitle, originalTitle);
+	// identityKey가 이미 존재하면 기존 festivalId를 반환하고,
+	// 없으면 insertIgnore로 새 행사 식별 정보를 저장한 뒤 festivalId를 조회
+	@Transactional
+	public Long getOrCreateFestivalId(String identityKey, String normalizedTitle, String originalTitle) {
+		// 중복 요청이 동시에 들어와도 unique key와 INSERT IGNORE로 중복 저장을 방지
+		festivalRepository.insertIgnore(identityKey, normalizedTitle, originalTitle);
 
-        return festivalRepository.findByIdentityKey(identityKey)
-                .map(FestivalEntity::getId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Festival 저장 또는 조회 실패: " + identityKey
-                ));
-    }
+		return festivalRepository.findByIdentityKey(identityKey).map(FestivalEntity::getId)
+				.orElseThrow(() -> new IllegalStateException("Festival 저장 또는 조회 실패: " + identityKey));
+	}
 }

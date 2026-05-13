@@ -1,140 +1,147 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
-    <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/searchlist.css?v=1.0">
-    <link rel="stylesheet" href="/assets/css/main.css?v=3.0">
-    <title>행사 검색 결과</title>
-    <style>
-    
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/searchlist.css?v=1.0">
+<link rel="stylesheet" href="/assets/css/main.css?v=3.0">
+<title>행사 검색 결과</title>
+<style>
+</style>
 </head>
 <body class="event-page">
-<div class="container">
-<!-- sidebar -->
+	<div class="container">
+		<!-- sidebar -->
 
-    <aside class="sidebar">
-        <div class="logo">
-            <a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
-        </div>
-        <div class="profile">
-            <div class="mypage-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+		<aside class="sidebar">
+			<div class="logo">
+				<a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
+			</div>
+			<div class="profile">
+				<div class="mypage-icon">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+						fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                <path
+							d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
             </svg>
-            </div>
-            <a href="/mypage"><span>마이페이지</span></a>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="/main">메인페이지</a>
-            <a href="/performance">공연행사</a>
-            <a href="/education">교육행사</a>
-            <a href="/culture">문화행사</a>
-            <a href="/exhibition">전시행사</a>
-        </nav>
-        <div class="footer">
-            <img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
-        </div>
-    </aside>
+				</div>
+				<a href="/mypage"><span>마이페이지</span></a>
+			</div>
+			<nav class="sidebar-nav">
+				<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+					href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+					href="/exhibition">전시행사</a>
+			</nav>
+			<div class="footer">
+				<img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
+			</div>
+		</aside>
 
-    <!-- Main Content -->
-    <main class="main-content event-shell">
-        <!-- Top Navigation -->
-        <header class="top-nav home-top-nav">
-    	<nav>
-        	<a href="/main">메인페이지</a>
-        	<a href="/performance">공연행사</a>
-       		 <a href="/education">교육행사</a>
-       	 	<a href="/culture">문화행사</a>
-        	<a href="/exhibition">전시행사</a>
-        	<a href="/customer">고객센터</a>
-    	</nav>
-    <div class="auth" id="authSection">
-        <a href="/login"><span>로그인 / 회원가입</span></a>
-    </div>
-</header>
-    
-    <section class="event-tools-card search-result-hero">
-    <div class="event-search-panel">
-        <div class="event-search-panel__text">
-            <p class="section-kicker">SEARCH</p>
-            <h2>행사 검색</h2>
-            <p>관심 있는 제목을 검색해보고, 일정·운영시간·공식 URL까지 한 번에 확인해보세요.</p>
-        </div>
+		<!-- Main Content -->
+		<main class="main-content event-shell">
+			<!-- Top Navigation -->
+			<header class="top-nav home-top-nav">
+				<nav>
+					<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+						href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+						href="/exhibition">전시행사</a> <a href="/customer">고객센터</a>
+				</nav>
+				<div class="auth" id="authSection">
+					<a href="/login"><span>로그인 / 회원가입</span></a>
+				</div>
+			</header>
 
-        <form th:action="@{/search}" method="get" class="event-search-form">
-            <div class="search-container event-search-container result-search-container">
-                <input type="text"
-                       name="keyword"
-                       placeholder="예: 사진전, 미술, 기획전"
-                       id="searchContent"
-                       maxlength="40"
-                       tabindex="0">
-                <button type="submit" aria-label="검색">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+			<section class="event-tools-card search-result-hero">
+				<div class="event-search-panel">
+					<div class="event-search-panel__text">
+						<p class="section-kicker">SEARCH</p>
+						<h2>행사 검색</h2>
+						<p>관심 있는 제목을 검색해보고, 일정·운영시간·공식 URL까지 한 번에 확인해보세요.</p>
+					</div>
+
+					<form th:action="@{/search}" method="get" class="event-search-form">
+						<div
+							class="search-container event-search-container result-search-container">
+							<input type="text" name="keyword" placeholder="예: 사진전, 미술, 기획전"
+								id="searchContent" maxlength="40" tabindex="0">
+							<button type="submit" aria-label="검색">
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+									fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path
+										d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                     </svg>
-                </button>
-            </div>
-        </form>
-    </div>
-</section>
+							</button>
+						</div>
+					</form>
+				</div>
+			</section>
 
 
-<section class="event-tools-card result-summary-card">
-    <div class="result-summary-head">
-        <div>
-            <p class="section-kicker">RESULT</p>
-            <h2>검색 결과</h2>
-            <p class="result-summary-desc">원하는 행사 정보를 빠르게 비교하고 상세 페이지로 이동해보세요.</p>
-        </div>
-        <div class="result-count">
-            <span th:text="${#lists.size(festivalData)}">0</span>개의 행사를 찾았어요
-        </div>
-    </div>
+			<section class="event-tools-card result-summary-card">
+				<div class="result-summary-head">
+					<div>
+						<p class="section-kicker">RESULT</p>
+						<h2>검색 결과</h2>
+						<p class="result-summary-desc">원하는 행사 정보를 빠르게 비교하고 상세 페이지로
+							이동해보세요.</p>
+					</div>
+					<div class="result-count">
+						<span th:text="${#lists.size(festivalData)}">0</span>개의 행사를 찾았어요
+					</div>
+				</div>
 
-    <ul class="festival-list portfolio-result-list">
-        <li th:each="festival : ${festivalData}" class="result-card">
-            <div class="result-thumb-wrap">
-                <img th:src="${festival.imageUrl}" alt="축제 이미지">
-            </div>
+				<ul class="festival-list portfolio-result-list">
+					<li th:each="festival : ${festivalData}" class="result-card">
+						<div class="result-thumb-wrap">
+							<img th:src="${festival.imageUrl}" alt="축제 이미지">
+						</div>
 
-            <div class="result-body">
-                <a th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}" class="result-title-link">
-                    <h3 th:text="${festival.title}">Festival Title</h3>
-                </a>
+						<div class="result-body">
+							<a
+								th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}"
+								class="result-title-link">
+								<h3 th:text="${festival.title}">Festival Title</h3>
+							</a>
 
-                <div class="result-meta-grid">
-                    <p><strong>행사 기간</strong><span th:text="${festival.beginDe}">Start Date</span> ~ <span th:text="${festival.endDe}">End Date</span></p>
+							<div class="result-meta-grid">
+								<p>
+									<strong>행사 기간</strong><span th:text="${festival.beginDe}">Start
+										Date</span> ~ <span th:text="${festival.endDe}">End Date</span>
+								</p>
 
-                    <p th:if="${festival.eventTmInfo != null && festival.eventTmInfo.trim() != ''}">
-                        <strong>운영시간</strong><span th:text="${festival.eventTmInfo}"></span>
-                    </p>
-                    <p th:if="${festival.eventTmInfo == null || festival.eventTmInfo.trim() == ''}">
-                        <strong>운영시간</strong><span>공식홈페이지 참고</span>
-                    </p>
+								<p
+									th:if="${festival.eventTmInfo != null && festival.eventTmInfo.trim() != ''}">
+									<strong>운영시간</strong><span th:text="${festival.eventTmInfo}"></span>
+								</p>
+								<p
+									th:if="${festival.eventTmInfo == null || festival.eventTmInfo.trim() == ''}">
+									<strong>운영시간</strong><span>공식홈페이지 참고</span>
+								</p>
 
-                    <p><strong>행사 구분</strong><span th:text="${festival.categoryNm}">구분</span></p>
+								<p>
+									<strong>행사 구분</strong><span th:text="${festival.categoryNm}">구분</span>
+								</p>
 
-                    <p>
-                        <strong>공식 URL</strong>
-                        <a th:href="${festival.url}" th:text="${festival.url}" target="_blank" rel="noopener">URL</a>
-                    </p>
-                </div>
+								<p>
+									<strong>공식 URL</strong> <a th:href="${festival.url}"
+										th:text="${festival.url}" target="_blank" rel="noopener">URL</a>
+								</p>
+							</div>
 
-                <div class="result-actions">
-                    <a th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}" class="result-detail-btn">상세 보기</a>
-                </div>
-            </div>
-        </li>
-    </ul>
-</section>
-    </main>
-</div>
+							<div class="result-actions">
+								<a
+									th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}"
+									class="result-detail-btn">상세 보기</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</section>
+		</main>
+	</div>
 </body>
 <script src="/assets/js/base.js"></script>
 </html>

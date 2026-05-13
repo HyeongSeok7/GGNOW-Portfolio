@@ -16,33 +16,33 @@
 
 	$(function() {
 
-		var	$window = $(window),
+		var $window = $(window),
 			$body = $('body');
 
 		// Disable animations/transitions until the page has loaded.
-			$body.addClass('is-loading');
+		$body.addClass('is-loading');
 
-			$window.on('load', function() {
-				window.setTimeout(function() {
-					$body.removeClass('is-loading');
-				}, 100);
-			});
+		$window.on('load', function() {
+			window.setTimeout(function() {
+				$body.removeClass('is-loading');
+			}, 100);
+		});
 
 		// Fix: Placeholder polyfill.
-			$('form').placeholder();
+		$('form').placeholder();
 
 		// Prioritize "important" elements on medium.
-			skel.on('+medium -medium', function() {
-				$.prioritize(
-					'.important\\28 medium\\29',
-					skel.breakpoint('medium').active
-				);
-			});
+		skel.on('+medium -medium', function() {
+			$.prioritize(
+				'.important\\28 medium\\29',
+				skel.breakpoint('medium').active
+			);
+		});
 
 		// Scrolly.
-			$('.scrolly').scrolly();
+		$('.scrolly').scrolly();
 
-		
+
 
 	});
 

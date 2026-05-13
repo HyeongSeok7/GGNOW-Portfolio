@@ -1,189 +1,205 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
-    <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/main.css?v=4.1">
-    <script>document.documentElement.classList.add('js-festival-reveal');</script>
-    <title>경기도 전시 행사 정보</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/main.css?v=4.1">
+<script>
+	document.documentElement.classList.add('js-festival-reveal');
+</script>
+<title>경기도 전시 행사 정보</title>
 </head>
 <body class="event-page">
-<div class="container">
-    <aside class="sidebar">
-        <div class="logo">
-            <a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
-        </div>
-        <div class="profile">
-            <div class="mypage-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+	<div class="container">
+		<aside class="sidebar">
+			<div class="logo">
+				<a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
+			</div>
+			<div class="profile">
+				<div class="mypage-icon">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+						fill="currentColor" viewBox="0 0 16 16">
+                    <path
+							d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
                 </svg>
-            </div>
-            <a href="/mypage"><span>마이페이지</span></a>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="/main">메인페이지</a>
-            <a href="/performance">공연행사</a>
-            <a href="/education">교육행사</a>
-            <a href="/culture">문화행사</a>
-            <a href="/exhibition">전시행사</a>
-        </nav>
-        <div class="footer">
-            <img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
-        </div>
-    </aside>
+				</div>
+				<a href="/mypage"><span>마이페이지</span></a>
+			</div>
+			<nav class="sidebar-nav">
+				<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+					href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+					href="/exhibition">전시행사</a>
+			</nav>
+			<div class="footer">
+				<img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
+			</div>
+		</aside>
 
-    <main class="main-content event-shell">
-        <header class="top-nav home-top-nav">
-            <nav>
-                <a href="/main">메인페이지</a>
-                <a href="/performance">공연행사</a>
-                <a href="/education">교육행사</a>
-                <a href="/culture">문화행사</a>
-                <a href="/exhibition">전시행사</a>
-                <a href="/customer">고객센터</a>
-            </nav>
-            <div class="auth" id="authSection">
-                <a href="/login"><span>로그인 / 회원가입</span></a>
-            </div>
-        </header>
+		<main class="main-content event-shell">
+			<header class="top-nav home-top-nav">
+				<nav>
+					<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+						href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+						href="/exhibition">전시행사</a> <a href="/customer">고객센터</a>
+				</nav>
+				<div class="auth" id="authSection">
+					<a href="/login"><span>로그인 / 회원가입</span></a>
+				</div>
+			</header>
 
-        <section class="event-hero exhibition-theme">
-            <div class="event-hero__copy">
-                <p class="hero-badge">EXHIBITION FESTIVAL</p>
-                <h1>경기도 전시 행사 정보</h1>
-                <p class="event-hero__desc">
-                    사진전, 기획전, 아트 전시까지
-                    감성적인 전시 행사들을 한곳에서 편하게 살펴보세요.
-                </p>
-            </div>
+			<section class="event-hero exhibition-theme">
+				<div class="event-hero__copy">
+					<p class="hero-badge">EXHIBITION FESTIVAL</p>
+					<h1>경기도 전시 행사 정보</h1>
+					<p class="event-hero__desc">사진전, 기획전, 아트 전시까지 감성적인 전시 행사들을 한곳에서
+						편하게 살펴보세요.</p>
+				</div>
 
-            <div class="event-hero__mascot">
-                <div class="event-hero__blob"></div>
-                <img src="/images/thumbs/mascot/Exhibition-mascot.png" alt="전시 마스코트">
-            </div>
-        </section>
+				<div class="event-hero__mascot">
+					<div class="event-hero__blob"></div>
+					<img src="/images/thumbs/mascot/Exhibition-mascot.png"
+						alt="전시 마스코트">
+				</div>
+			</section>
 
-        <section class="event-tools-card">
-            <div class="event-search-panel">
-                <div class="event-search-panel__text">
-                    <p class="section-kicker">SEARCH</p>
-                    <h2>전시 행사 검색</h2>
-                    <p>관심 있는 전시 제목을 검색해보세요.</p>
-                </div>
+			<section class="event-tools-card">
+				<div class="event-search-panel">
+					<div class="event-search-panel__text">
+						<p class="section-kicker">SEARCH</p>
+						<h2>전시 행사 검색</h2>
+						<p>관심 있는 전시 제목을 검색해보세요.</p>
+					</div>
 
-                <form th:action="@{/search}" method="get" class="search event-search-form">
-                    <div class="search-container event-search-container">
-                        <input type="text" name="keyword" placeholder="예: 사진전, 미술, 기획전" id="searchContent" maxlength="40" tabindex="0">
-                        <button type="submit" aria-label="검색">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+					<form th:action="@{/search}" method="get"
+						class="search event-search-form">
+						<div class="search-container event-search-container">
+							<input type="text" name="keyword" placeholder="예: 사진전, 미술, 기획전"
+								id="searchContent" maxlength="40" tabindex="0">
+							<button type="submit" aria-label="검색">
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+									fill="currentColor" viewBox="0 0 16 16">
+                                <path
+										d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                             </svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
+							</button>
+						</div>
+					</form>
+				</div>
 
-            <div class="event-sort-box">
-                <label for="sortOption">정렬 기준</label>
-                <select id="sortOption">
-                    <option value="latest">최신순</option>
-                    <option value="deadline">마감임박순</option>
-                </select>
-            </div>
-        </section>
+				<div class="event-sort-box">
+					<label for="sortOption">정렬 기준</label> <select id="sortOption">
+						<option value="latest">최신순</option>
+						<option value="deadline">마감임박순</option>
+					</select>
+				</div>
+			</section>
 
-        <section class="event-list-wrap"
-         th:with="exhibitionEvents=${festivalData != null and festivalData.row != null ? festivalData.row.?[categoryNm != null and #strings.trim(categoryNm) == '전시'] : null}">
-    <div class="section-intro">
-        <p class="section-kicker">EVENT LIST</p>
-        <h2>지금 확인할 수 있는 전시 행사</h2>
-        <p>마음에 드는 문화 행사를 저장하고 자세한 정보를 확인해보세요.</p>
-    </div>
+			<section class="event-list-wrap"
+				th:with="exhibitionEvents=${festivalData != null and festivalData.row != null ? festivalData.row.?[categoryNm != null and #strings.trim(categoryNm) == '전시'] : null}">
+				<div class="section-intro">
+					<p class="section-kicker">EVENT LIST</p>
+					<h2>지금 확인할 수 있는 전시 행사</h2>
+					<p>마음에 드는 문화 행사를 저장하고 자세한 정보를 확인해보세요.</p>
+				</div>
 
-	<div th:if="${exhibitionEvents == null or #lists.isEmpty(exhibitionEvents)}" class="empty-state dreamy-empty-state">
-    <div class="dreamy-empty-visual exhibition-empty-visual">
-        <div class="dreamy-empty-badge">NO EXHIBITION</div>
-        <div class="dreamy-empty-icon">🖼️</div>
-    </div>
+				<div
+					th:if="${exhibitionEvents == null or #lists.isEmpty(exhibitionEvents)}"
+					class="empty-state dreamy-empty-state">
+					<div class="dreamy-empty-visual exhibition-empty-visual">
+						<div class="dreamy-empty-badge">NO EXHIBITION</div>
+						<div class="dreamy-empty-icon">🖼️</div>
+					</div>
 
-    <div class="dreamy-empty-content">
-        <h3 class="dreamy-empty-title">현재 진행 중인 전시 행사가 없어요</h3>
-        <p class="dreamy-empty-desc">
-            전시 일정은 계절별로 새롭게 열리기도 해요. 다른 카테고리 행사도 함께 둘러보세요.
-        </p>
+					<div class="dreamy-empty-content">
+						<h3 class="dreamy-empty-title">현재 진행 중인 전시 행사가 없어요</h3>
+						<p class="dreamy-empty-desc">전시 일정은 계절별로 새롭게 열리기도 해요. 다른 카테고리
+							행사도 함께 둘러보세요.</p>
 
-        <div class="dreamy-empty-tags">
-            <span># 미술 · 사진</span>
-            <span># 전시 일정 확인</span>
-            <span># 새로운 전시 업데이트 예정</span>
-        </div>
+						<div class="dreamy-empty-tags">
+							<span># 미술 · 사진</span> <span># 전시 일정 확인</span> <span># 새로운
+								전시 업데이트 예정</span>
+						</div>
 
-        <div class="dreamy-empty-actions">
-            <a href="/performance" class="dreamy-empty-btn secondary">공연행사 보기</a>
-            <a href="/education" class="dreamy-empty-btn secondary">교육행사 보기</a>
-            <a href="/culture" class="dreamy-empty-btn secondary">문화행사 보기</a>
-            <a href="/main" class="dreamy-empty-btn primary">메인으로 가기</a>
-        </div>
-    </div>
-</div>
+						<div class="dreamy-empty-actions">
+							<a href="/performance" class="dreamy-empty-btn secondary">공연행사
+								보기</a> <a href="/education" class="dreamy-empty-btn secondary">교육행사
+								보기</a> <a href="/culture" class="dreamy-empty-btn secondary">문화행사
+								보기</a> <a href="/main" class="dreamy-empty-btn primary">메인으로 가기</a>
+						</div>
+					</div>
+				</div>
 
-    <div th:unless="${exhibitionEvents == null or #lists.isEmpty(exhibitionEvents)}"
-     class="event-cards dreamy-event-grid"
-     id="eventList">
-    <div th:each="festival : ${exhibitionEvents}"
-         class="festival-card dreamy-festival-card"
-         th:data-start="${festival.beginDe}"
-         th:data-end="${festival.endDe}">
+				<div
+					th:unless="${exhibitionEvents == null or #lists.isEmpty(exhibitionEvents)}"
+					class="event-cards dreamy-event-grid" id="eventList">
+					<div th:each="festival : ${exhibitionEvents}"
+						class="festival-card dreamy-festival-card"
+						th:data-start="${festival.beginDe}"
+						th:data-end="${festival.endDe}">
 
-            <div class="festival-info dreamy-festival-info">
-                <div class="image-container dreamy-image-container">
-                    <img th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}" alt="축제 이미지">
-                    <span class="star-icon" th:data-event-id="${festival.festivalId}">&#9733;</span>
-                </div>
+						<div class="festival-info dreamy-festival-info">
+							<div class="image-container dreamy-image-container">
+								<img
+									th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
+									alt="축제 이미지"> <span class="star-icon"
+									th:data-event-id="${festival.festivalId}">&#9733;</span>
+							</div>
 
-                <div class="dreamy-card-body">
-                    <span class="category-chip">EXHIBITION</span>
-                    <h2 th:text="${festival.title}">행사 제목</h2>
+							<div class="dreamy-card-body">
+								<span class="category-chip">EXHIBITION</span>
+								<h2 th:text="${festival.title}">행사 제목</h2>
 
-                    <p th:if="${festival.beginDe != null && festival.endDe != null && festival.beginDe.trim() != '' && festival.endDe.trim() != ''}" class="festival-value">
-                        <strong>기간</strong>
-                        <span th:text="${festival.beginDe}" class="festival-label"></span>
-                        <span>~</span>
-                        <span th:text="${festival.endDe}" class="festival-label"></span>
-                    </p>
-                    <p th:if="${festival.beginDe == null || festival.endDe == null || festival.beginDe.trim() == '' || festival.endDe.trim() == ''}" class="festival-value">
-                        <strong>기간</strong> 공식홈페이지 참고
-                    </p>
+								<p
+									th:if="${festival.beginDe != null && festival.endDe != null && festival.beginDe.trim() != '' && festival.endDe.trim() != ''}"
+									class="festival-value">
+									<strong>기간</strong> <span th:text="${festival.beginDe}"
+										class="festival-label"></span> <span>~</span> <span
+										th:text="${festival.endDe}" class="festival-label"></span>
+								</p>
+								<p
+									th:if="${festival.beginDe == null || festival.endDe == null || festival.beginDe.trim() == '' || festival.endDe.trim() == ''}"
+									class="festival-value">
+									<strong>기간</strong> 공식홈페이지 참고
+								</p>
 
-                    <p th:if="${festival.eventTmInfo != null && festival.eventTmInfo.trim() != ''}" class="festival-value">
-                        <strong>운영시간</strong>
-                        <span th:text="${festival.eventTmInfo}" class="festival-label"></span>
-                    </p>
-                    <p th:if="${festival.eventTmInfo == null || festival.eventTmInfo.trim() == ''}" class="festival-value">
-                        <strong>운영시간</strong> 공식홈페이지 참고
-                    </p>
+								<p
+									th:if="${festival.eventTmInfo != null && festival.eventTmInfo.trim() != ''}"
+									class="festival-value">
+									<strong>운영시간</strong> <span th:text="${festival.eventTmInfo}"
+										class="festival-label"></span>
+								</p>
+								<p
+									th:if="${festival.eventTmInfo == null || festival.eventTmInfo.trim() == ''}"
+									class="festival-value">
+									<strong>운영시간</strong> 공식홈페이지 참고
+								</p>
 
-                    <p th:if="${festival.partcptExpnInfo != null && festival.partcptExpnInfo.trim() != ''}" class="festival-value">
-                        <strong>참가비</strong>
-                        <span th:text="${festival.partcptExpnInfo}" class="festival-label"></span>
-                    </p>
-                    <p th:if="${festival.partcptExpnInfo == null || festival.partcptExpnInfo.trim() == ''}" class="festival-value">
-                        <strong>참가비</strong> 공식홈페이지 참고
-                    </p>
+								<p
+									th:if="${festival.partcptExpnInfo != null && festival.partcptExpnInfo.trim() != ''}"
+									class="festival-value">
+									<strong>참가비</strong> <span
+										th:text="${festival.partcptExpnInfo}" class="festival-label"></span>
+								</p>
+								<p
+									th:if="${festival.partcptExpnInfo == null || festival.partcptExpnInfo.trim() == ''}"
+									class="festival-value">
+									<strong>참가비</strong> 공식홈페이지 참고
+								</p>
 
-                    <a th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}" class="dreamy-detail-btn">상세 보기</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-    </main>
-</div>
+								<a
+									th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}"
+									class="dreamy-detail-btn">상세 보기</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
 
-<script src="/assets/js/base.js?v=4.0"></script>
+	<script src="/assets/js/base.js?v=4.0"></script>
 </body>
 </html>

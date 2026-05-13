@@ -1,245 +1,230 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
-    <meta name="currentUsername" th:content="${currentUsername}">
-    <meta name="festivalId" th:content="${festivalId}">
-    <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/detail.css?v=2.0">
-    <link rel="stylesheet" href="/assets/css/main.css?v=3.0">
-    <title th:text="${festival.title} + ' | 상세페이지'">행사 상세페이지</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<meta name="currentUsername" th:content="${currentUsername}">
+<meta name="festivalId" th:content="${festivalId}">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/detail.css?v=2.0">
+<link rel="stylesheet" href="/assets/css/main.css?v=3.0">
+<title th:text="${festival.title} + ' | 상세페이지'">행사 상세페이지</title>
 </head>
 <body class="detail-page">
 
-<aside class="sidebar">
-    <div class="logo">
-        <a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
-    </div>
-    <div class="profile">
-        <div class="mypage-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-            </svg>
-        </div>
-        <a href="/mypage"><span>마이페이지</span></a>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/main">메인페이지</a>
-        <a href="/performance">공연행사</a>
-        <a href="/education">교육행사</a>
-        <a href="/culture">문화행사</a>
-        <a href="/exhibition">전시행사</a>
-    </nav>
-    <div class="footer">
-        <img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
-    </div>
-</aside>
-
-<main class="main-content detail-shell">
-    <header class="top-nav home-top-nav">
-        <nav>
-            <a href="/main">메인페이지</a>
-            <a href="/performance">공연행사</a>
-            <a href="/education">교육행사</a>
-            <a href="/culture">문화행사</a>
-            <a href="/exhibition">전시행사</a>
-            <a href="/customer">고객센터</a>
-        </nav>
-        <div class="auth" id="authSection">
-            <a href="/login"><span>로그인 / 회원가입</span></a>
-        </div>
-    </header>
-
-    <section class="detail-hero">
-        <div class="detail-hero__text">
-            <p class="detail-badge">FESTIVAL DETAIL</p>
-            <h1 th:text="${festival.title}">행사 제목</h1>
-            <p class="detail-hero__desc">행사 핵심 정보와 바로가기 링크, 리뷰를 한곳에서 확인해보세요.</p>
-
-            <div class="detail-hero__actions">
-                <a href="javascript:history.back()" class="detail-action-btn secondary">이전 페이지</a>
-                <button type="button"
-                        id="favoriteToggleBtn"
-                        class="detail-action-btn primary"
-                        th:attr="data-event-id=${festivalId}">
-                    즐겨찾기
-                </button>
-            </div>
-        </div>
-
-        <div class="detail-hero__visual">
-    		<div class="detail-hero__blob"></div>
-
-    		<button type="button"
-            	class="detail-image-trigger"
-            	id="detailImageTrigger"
-            	aria-label="행사 이미지 크게 보기">
-        	<img id="detailHeroImage"
-             th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
-             alt="행사 이미지">
-    		</button>
+	<aside class="sidebar">
+		<div class="logo">
+			<a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
 		</div>
-    </section>
+		<div class="profile">
+			<div class="mypage-icon">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+					fill="currentColor" viewBox="0 0 16 16">
+                <path
+						d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+            </svg>
+			</div>
+			<a href="/mypage"><span>마이페이지</span></a>
+		</div>
+		<nav class="sidebar-nav">
+			<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+				href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+				href="/exhibition">전시행사</a>
+		</nav>
+		<div class="footer">
+			<img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
+		</div>
+	</aside>
 
-    <section class="detail-page-stack">
-        <section class="detail-top-grid">
-            <section class="detail-card info-card">
-                <div class="section-head">
-                    <div>
-                        <p class="section-kicker">INFORMATION</p>
-                        <h2>행사 정보</h2>
-                    </div>
-                </div>
+	<main class="main-content detail-shell">
+		<header class="top-nav home-top-nav">
+			<nav>
+				<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+					href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+					href="/exhibition">전시행사</a> <a href="/customer">고객센터</a>
+			</nav>
+			<div class="auth" id="authSection">
+				<a href="/login"><span>로그인 / 회원가입</span></a>
+			</div>
+		</header>
 
-                <div class="info-list info-list--grid">
-                    <div class="info-item">
-                        <span class="info-label">행사명</span>
-                        <strong th:text="${festival.title}">행사명</strong>
-                    </div>
+		<section class="detail-hero">
+			<div class="detail-hero__text">
+				<p class="detail-badge">FESTIVAL DETAIL</p>
+				<h1 th:text="${festival.title}">행사 제목</h1>
+				<p class="detail-hero__desc">행사 핵심 정보와 바로가기 링크, 리뷰를 한곳에서 확인해보세요.</p>
 
-                    <div class="info-item">
-                        <span class="info-label">카테고리</span>
-                        <strong th:text="${festival.categoryNm != null && !#strings.isEmpty(festival.categoryNm) ? festival.categoryNm : '공식 홈페이지 참고'}">카테고리</strong>
-                    </div>
+				<div class="detail-hero__actions">
+					<a href="javascript:history.back()"
+						class="detail-action-btn secondary">이전 페이지</a>
+					<button type="button" id="favoriteToggleBtn"
+						class="detail-action-btn primary"
+						th:attr="data-event-id=${festivalId}">즐겨찾기</button>
+				</div>
+			</div>
 
-                    <div class="info-item">
-                        <span class="info-label">기간</span>
-                        <strong>
-                            <span th:text="${festival.beginDe != null && !#strings.isEmpty(festival.beginDe) ? festival.beginDe : '공식 홈페이지 참고'}"></span>
-                            <span th:if="${festival.beginDe != null && !#strings.isEmpty(festival.beginDe) && festival.endDe != null && !#strings.isEmpty(festival.endDe)}"> ~ </span>
-                            <span th:text="${festival.endDe != null && !#strings.isEmpty(festival.endDe) ? festival.endDe : ''}"></span>
-                        </strong>
-                    </div>
+			<div class="detail-hero__visual">
+				<div class="detail-hero__blob"></div>
 
-                    <div class="info-item">
-                        <span class="info-label">운영시간</span>
-                        <strong th:text="${festival.eventTmInfo != null && !#strings.isEmpty(festival.eventTmInfo) ? festival.eventTmInfo : '공식 홈페이지 참고'}">운영시간</strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">장소</span>
-                        <strong th:text="${festival.addr != null && !#strings.isEmpty(festival.addr) ? festival.addr : '공식 홈페이지 참고'}">장소</strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">참가비</span>
-                        <strong th:text="${festival.partcptExpnInfo != null && !#strings.isEmpty(festival.partcptExpnInfo) ? festival.partcptExpnInfo : '공식 홈페이지 참고'}">참가비</strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">문의처</span>
-                        <strong th:text="${festival.telnoInfo != null && !#strings.isEmpty(festival.telnoInfo) ? festival.telnoInfo : '공식 홈페이지 참고'}">문의처</strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">주최기관</span>
-                        <strong th:text="${festival.hostInstNm != null && !#strings.isEmpty(festival.hostInstNm) ? festival.hostInstNm : '공식 홈페이지 참고'}">주최기관</strong>
-                    </div>
-                </div>
-            </section>
-
-            <aside class="detail-side-column">
-                <section class="detail-card link-card">
-                    <div class="section-head">
-                        <div>
-                            <p class="section-kicker">LINK</p>
-                            <h2>바로가기</h2>
-                        </div>
-                    </div>
-
-                    <div class="detail-link-group">
-                        <a th:if="${festival.hmpgUrl != null && !#strings.isEmpty(festival.hmpgUrl)}"
-                           th:href="${festival.hmpgUrl}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="detail-link-btn">
-                            공식 홈페이지 이동
-                        </a>
-
-                        <a th:if="${festival.url != null && !#strings.isEmpty(festival.url)}"
-                           th:href="${festival.url}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="detail-link-btn secondary">
-                            원본 링크 보기
-                        </a>
-
-                        <a href="/main" class="detail-link-btn secondary">
-                            다른 행사 더 보기
-                        </a>
-                    </div>
-                </section>
-            </aside>
-        </section>
-
-        <section class="detail-bottom-stack">
-            <section class="detail-card review-card">
-    			<div class="section-head">
-        		<div>
-            	<p class="section-kicker">REVIEW</p>
-            	<h2>리뷰 작성</h2>
-        		</div>
-    			</div>
-
-    			<form class="review-form" id="reviewForm">
-        			<textarea id="reviewContent" name="content" rows="5" placeholder="행사에 대한 후기를 남겨주세요."></textarea>
-        			<button type="submit" class="primary-submit-btn">리뷰 등록</button>
-        			<p class="review-login-hint" id="reviewLoginHint" hidden>
- 				           로그인 후 리뷰를 작성할 수 있어요.
-        			</p>
-    			</form>
+				<button type="button" class="detail-image-trigger"
+					id="detailImageTrigger" aria-label="행사 이미지 크게 보기">
+					<img id="detailHeroImage"
+						th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
+						alt="행사 이미지">
+				</button>
+			</div>
 		</section>
 
-            <section class="detail-card review-list-card">
-                <div class="section-head">
-                    <div>
-                        <p class="section-kicker">REVIEW LIST</p>
-                        <h2>작성된 리뷰</h2>
-                    </div>
-                </div>
+		<section class="detail-page-stack">
+			<section class="detail-top-grid">
+				<section class="detail-card info-card">
+					<div class="section-head">
+						<div>
+							<p class="section-kicker">INFORMATION</p>
+							<h2>행사 정보</h2>
+						</div>
+					</div>
 
-                <div id="reviewList" class="review-list"></div>
-            </section>
-        </section>
-    </section>
-    
-    <div id="loginPromptModal" class="login-prompt-modal" hidden>
-    <div class="login-prompt-modal__backdrop"></div>
-    <div class="login-prompt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="loginPromptTitle">
-        <button type="button" class="login-prompt-modal__close" id="loginPromptClose" aria-label="닫기">×</button>
-        <div class="login-prompt-modal__icon">🔐</div>
-        <p class="login-prompt-modal__eyebrow">LOGIN REQUIRED</p>
-        <h3 id="loginPromptTitle">로그인이 필요해요</h3>
-        <p id="loginPromptMessage">이 기능은 로그인 후 이용할 수 있어요.</p>
+					<div class="info-list info-list--grid">
+						<div class="info-item">
+							<span class="info-label">행사명</span> <strong
+								th:text="${festival.title}">행사명</strong>
+						</div>
 
-        <div class="login-prompt-modal__actions">
-            <button type="button" class="login-prompt-btn secondary" id="loginPromptCancel">닫기</button>
-            <a href="/login" class="login-prompt-btn primary">로그인하러 가기</a>
-        </div>
-    </div>
-</div>
-</main>
+						<div class="info-item">
+							<span class="info-label">카테고리</span> <strong
+								th:text="${festival.categoryNm != null && !#strings.isEmpty(festival.categoryNm) ? festival.categoryNm : '공식 홈페이지 참고'}">카테고리</strong>
+						</div>
 
-<div class="image-lightbox" id="imageLightbox" aria-hidden="true">
-    <div class="image-lightbox__backdrop" id="imageLightboxBackdrop"></div>
+						<div class="info-item">
+							<span class="info-label">기간</span> <strong> <span
+								th:text="${festival.beginDe != null && !#strings.isEmpty(festival.beginDe) ? festival.beginDe : '공식 홈페이지 참고'}"></span>
+								<span
+								th:if="${festival.beginDe != null && !#strings.isEmpty(festival.beginDe) && festival.endDe != null && !#strings.isEmpty(festival.endDe)}">
+									~ </span> <span
+								th:text="${festival.endDe != null && !#strings.isEmpty(festival.endDe) ? festival.endDe : ''}"></span>
+							</strong>
+						</div>
 
-    <div class="image-lightbox__dialog" role="dialog" aria-modal="true" aria-label="행사 이미지 크게 보기">
-        <button type="button"
-                class="image-lightbox__close"
-                id="imageLightboxClose"
-                aria-label="닫기">×</button>
+						<div class="info-item">
+							<span class="info-label">운영시간</span> <strong
+								th:text="${festival.eventTmInfo != null && !#strings.isEmpty(festival.eventTmInfo) ? festival.eventTmInfo : '공식 홈페이지 참고'}">운영시간</strong>
+						</div>
 
-        <img src=""
-             alt="확대 이미지"
-             class="image-lightbox__img"
-             id="imageLightboxImg">
-    </div>
-</div>
+						<div class="info-item">
+							<span class="info-label">장소</span> <strong
+								th:text="${festival.addr != null && !#strings.isEmpty(festival.addr) ? festival.addr : '공식 홈페이지 참고'}">장소</strong>
+						</div>
 
-<script src="/assets/js/detail.js"></script>
-<script src="/assets/js/base.js"></script>
+						<div class="info-item">
+							<span class="info-label">참가비</span> <strong
+								th:text="${festival.partcptExpnInfo != null && !#strings.isEmpty(festival.partcptExpnInfo) ? festival.partcptExpnInfo : '공식 홈페이지 참고'}">참가비</strong>
+						</div>
+
+						<div class="info-item">
+							<span class="info-label">문의처</span> <strong
+								th:text="${festival.telnoInfo != null && !#strings.isEmpty(festival.telnoInfo) ? festival.telnoInfo : '공식 홈페이지 참고'}">문의처</strong>
+						</div>
+
+						<div class="info-item">
+							<span class="info-label">주최기관</span> <strong
+								th:text="${festival.hostInstNm != null && !#strings.isEmpty(festival.hostInstNm) ? festival.hostInstNm : '공식 홈페이지 참고'}">주최기관</strong>
+						</div>
+					</div>
+				</section>
+
+				<aside class="detail-side-column">
+					<section class="detail-card link-card">
+						<div class="section-head">
+							<div>
+								<p class="section-kicker">LINK</p>
+								<h2>바로가기</h2>
+							</div>
+						</div>
+
+						<div class="detail-link-group">
+							<a
+								th:if="${festival.hmpgUrl != null && !#strings.isEmpty(festival.hmpgUrl)}"
+								th:href="${festival.hmpgUrl}" target="_blank"
+								rel="noopener noreferrer" class="detail-link-btn"> 공식 홈페이지
+								이동 </a> <a
+								th:if="${festival.url != null && !#strings.isEmpty(festival.url)}"
+								th:href="${festival.url}" target="_blank"
+								rel="noopener noreferrer" class="detail-link-btn secondary">
+								원본 링크 보기 </a> <a href="/main" class="detail-link-btn secondary">
+								다른 행사 더 보기 </a>
+						</div>
+					</section>
+				</aside>
+			</section>
+
+			<section class="detail-bottom-stack">
+				<section class="detail-card review-card">
+					<div class="section-head">
+						<div>
+							<p class="section-kicker">REVIEW</p>
+							<h2>리뷰 작성</h2>
+						</div>
+					</div>
+
+					<form class="review-form" id="reviewForm">
+						<textarea id="reviewContent" name="content" rows="5"
+							placeholder="행사에 대한 후기를 남겨주세요."></textarea>
+						<button type="submit" class="primary-submit-btn">리뷰 등록</button>
+						<p class="review-login-hint" id="reviewLoginHint" hidden>로그인 후
+							리뷰를 작성할 수 있어요.</p>
+					</form>
+				</section>
+
+				<section class="detail-card review-list-card">
+					<div class="section-head">
+						<div>
+							<p class="section-kicker">REVIEW LIST</p>
+							<h2>작성된 리뷰</h2>
+						</div>
+					</div>
+
+					<div id="reviewList" class="review-list"></div>
+				</section>
+			</section>
+		</section>
+
+		<div id="loginPromptModal" class="login-prompt-modal" hidden>
+			<div class="login-prompt-modal__backdrop"></div>
+			<div class="login-prompt-modal__dialog" role="dialog"
+				aria-modal="true" aria-labelledby="loginPromptTitle">
+				<button type="button" class="login-prompt-modal__close"
+					id="loginPromptClose" aria-label="닫기">×</button>
+				<div class="login-prompt-modal__icon">🔐</div>
+				<p class="login-prompt-modal__eyebrow">LOGIN REQUIRED</p>
+				<h3 id="loginPromptTitle">로그인이 필요해요</h3>
+				<p id="loginPromptMessage">이 기능은 로그인 후 이용할 수 있어요.</p>
+
+				<div class="login-prompt-modal__actions">
+					<button type="button" class="login-prompt-btn secondary"
+						id="loginPromptCancel">닫기</button>
+					<a href="/login" class="login-prompt-btn primary">로그인하러 가기</a>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+		<div class="image-lightbox__backdrop" id="imageLightboxBackdrop"></div>
+
+		<div class="image-lightbox__dialog" role="dialog" aria-modal="true"
+			aria-label="행사 이미지 크게 보기">
+			<button type="button" class="image-lightbox__close"
+				id="imageLightboxClose" aria-label="닫기">×</button>
+
+			<img src="" alt="확대 이미지" class="image-lightbox__img"
+				id="imageLightboxImg">
+		</div>
+	</div>
+
+	<script src="/assets/js/detail.js"></script>
+	<script src="/assets/js/base.js"></script>
 </body>
 </html>

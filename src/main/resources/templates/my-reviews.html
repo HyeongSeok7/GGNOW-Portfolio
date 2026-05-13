@@ -1,106 +1,103 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}">
-	<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
 <link rel="stylesheet" href="/assets/css/base.css">
 <link rel="stylesheet" href="/assets/css/main.css?v=3.0">
 <link rel="stylesheet" href="/assets/css/mypage.css">
-    <title>작성 리뷰 조회</title>
+<title>작성 리뷰 조회</title>
 </head>
 <body class="event-page">
-<aside class="sidebar">
-    <div class="logo">
-        <a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
-    </div>
-    <div class="profile">
-        <div class="mypage-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+	<aside class="sidebar">
+		<div class="logo">
+			<a href="/main"><img src="/images/logo.jpg" alt="경기도 로고"></a>
+		</div>
+		<div class="profile">
+			<div class="mypage-icon">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+					fill="currentColor" viewBox="0 0 16 16">
+                <path
+						d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
             </svg>
-        </div>
-        <a href="/mypage"><span>마이페이지</span></a>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/main">메인페이지</a>
-        <a href="/performance">공연행사</a>
-        <a href="/education">교육행사</a>
-        <a href="/culture">문화행사</a>
-        <a href="/exhibition">전시행사</a>
-    </nav>
-    <div class="footer">
-        <img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
-    </div>
-</aside>
+			</div>
+			<a href="/mypage"><span>마이페이지</span></a>
+		</div>
+		<nav class="sidebar-nav">
+			<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+				href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+				href="/exhibition">전시행사</a>
+		</nav>
+		<div class="footer">
+			<img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
+		</div>
+	</aside>
 
-<main class="main-content event-shell">
-	<header class="top-nav home-top-nav">
-    <nav>
-        <a href="/main">메인페이지</a>
-        <a href="/performance">공연행사</a>
-        <a href="/education">교육행사</a>
-        <a href="/culture">문화행사</a>
-        <a href="/exhibition">전시행사</a>
-        <a href="/customer">고객센터</a>
-    </nav>
-    <div class="auth" id="authSection">
-        <a href="/login"><span>로그인 / 회원가입</span></a>
-    </div>
-</header>
+	<main class="main-content event-shell">
+		<header class="top-nav home-top-nav">
+			<nav>
+				<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
+					href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
+					href="/exhibition">전시행사</a> <a href="/customer">고객센터</a>
+			</nav>
+			<div class="auth" id="authSection">
+				<a href="/login"><span>로그인 / 회원가입</span></a>
+			</div>
+		</header>
 
-    <section class="page-hero compact">
-        <div>
-            <p class="hero-badge">MY REVIEWS</p>
-            <h1>내가 작성한 리뷰</h1>
-            <p class="hero-desc">내가 남긴 행사 후기를 한곳에서 확인해보세요.</p>
-        </div>
-        <div class="hero-actions">
-            <a href="/mypage" class="hero-action-btn secondary">마이페이지로</a>
-            <a href="/change-password" class="hero-action-btn secondary">비밀번호 변경</a>
-        </div>
-    </section>
+		<section class="page-hero compact">
+			<div>
+				<p class="hero-badge">MY REVIEWS</p>
+				<h1>내가 작성한 리뷰</h1>
+				<p class="hero-desc">내가 남긴 행사 후기를 한곳에서 확인해보세요.</p>
+			</div>
+			<div class="hero-actions">
+				<a href="/mypage" class="hero-action-btn secondary">마이페이지로</a> <a
+					href="/change-password" class="hero-action-btn secondary">비밀번호
+					변경</a>
+			</div>
+		</section>
 
-    <section class="single-column-layout">
-        <div class="reviews-card card-surface">
-            <div class="section-head">
-                <div>
-                    <p class="section-kicker">REVIEW HISTORY</p>
-                    <h2>작성 리뷰 목록</h2>
-                </div>
-                <span class="section-count" th:text="${#lists.size(reviews)} + '개'">0개</span>
-            </div>
+		<section class="single-column-layout">
+			<div class="reviews-card card-surface">
+				<div class="section-head">
+					<div>
+						<p class="section-kicker">REVIEW HISTORY</p>
+						<h2>작성 리뷰 목록</h2>
+					</div>
+					<span class="section-count" th:text="${#lists.size(reviews)} + '개'">0개</span>
+				</div>
 
-            <div th:if="${#lists.isEmpty(reviews)}" class="empty-state">
-                <div class="empty-icon">✍</div>
-                <p class="empty-title">아직 작성한 리뷰가 없어요</p>
-                <p class="empty-desc">행사 상세 페이지에서 첫 리뷰를 남겨보세요.</p>
-                <a href="/main" class="empty-link">행사 둘러보기</a>
-            </div>
+				<div th:if="${#lists.isEmpty(reviews)}" class="empty-state">
+					<div class="empty-icon">✍</div>
+					<p class="empty-title">아직 작성한 리뷰가 없어요</p>
+					<p class="empty-desc">행사 상세 페이지에서 첫 리뷰를 남겨보세요.</p>
+					<a href="/main" class="empty-link">행사 둘러보기</a>
+				</div>
 
-            <div class="review-list" th:if="${!#lists.isEmpty(reviews)}">
-                <article th:each="r : ${reviews}" class="review-item">
-                    <div class="review-item__top">
-                        <div>
-                            <span class="event-chip">REVIEW</span>
-                            <h3 th:text="${r.festivalTitle}">축제명</h3>
-                            <p class="review-date"
-                               th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</p>
-                        </div>
+				<div class="review-list" th:if="${!#lists.isEmpty(reviews)}">
+					<article th:each="r : ${reviews}" class="review-item">
+						<div class="review-item__top">
+							<div>
+								<span class="event-chip">REVIEW</span>
+								<h3 th:text="${r.festivalTitle}">축제명</h3>
+								<p class="review-date"
+									th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</p>
+							</div>
 
-                        <a th:href="@{/festival/id/{festivalId}(festivalId=${r.festivalId})}"
-                           class="review-detail-link">
-                            상세보기 →
-                        </a>
-                    </div>
+							<a
+								th:href="@{/festival/id/{festivalId}(festivalId=${r.festivalId})}"
+								class="review-detail-link"> 상세보기 → </a>
+						</div>
 
-                    <div class="review-content" th:text="${r.content}">리뷰 내용</div>
-                </article>
-            </div>
-        </div>
-    </section>
-</main>
-<script src="/assets/js/base.js"></script>
+						<div class="review-content" th:text="${r.content}">리뷰 내용</div>
+					</article>
+				</div>
+			</div>
+		</section>
+	</main>
+	<script src="/assets/js/base.js"></script>
 </body>
 </html>

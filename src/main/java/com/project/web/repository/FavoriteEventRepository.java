@@ -12,11 +12,11 @@ import java.util.List;
 //사용자별 즐겨찾기 조회, 삭제, 중복 확인에 사용
 @Repository
 public interface FavoriteEventRepository extends JpaRepository<FavoriteEvent, Long> {
-    List<FavoriteEvent> findAllByUsername(String username);
+	List<FavoriteEvent> findAllByUsername(String username);
 
-    @Transactional
-    @Modifying
-    void deleteByUsernameAndEventId(String username, String eventId);
+	@Transactional
+	@Modifying
+	void deleteByUsernameAndEventId(String username, String eventId);
 
-    boolean existsByUsernameAndEventId(String username, String eventId);
+	boolean existsByUsernameAndEventId(String username, String eventId);
 }
