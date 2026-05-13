@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //행사 상세 조회와 즐겨찾기 API를 담당하는 컨트롤러
-//외부 API 데이터와 내부 DB의 festivalId를 연결해 상세 페이지, 즐겨찾기 기능에서 사용!!!
+//외부 API 데이터와 내부 DB의 festivalId를 연결해 상세 페이지, 즐겨찾기 기능에서 사용
 @Controller
 public class FestivalController {
 
@@ -63,7 +63,7 @@ public class FestivalController {
             FestivalResponse.Row festival = festivalService.getFestivalByNormalizedTitle(normalizedTitle);
 
             // 외부 API에는 안정적인 내부 PK가 없기 때문에,
-            // 행사 정보를 조합한 identityKey를 기준으로 DB의 festivalId를 생성하거나 조회한다.
+            // 행사 정보를 조합한 identityKey를 기준으로 DB의 festivalId를 생성하거나 조회
             String identityKey = festivalService.createFestivalIdentityKey(festival);
 
             Long festivalId = festivalIdentityService.getOrCreateFestivalId(

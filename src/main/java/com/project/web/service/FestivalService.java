@@ -16,12 +16,17 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //경기도 공공데이터 API에서 행사 데이터를 가져오고,
 //검색, 상세 조회, 중복 제거, 내부 식별키 생성을 담당하는 서비스
 @Service
 public class FestivalService {
 
-	// API 호출에 필요한 설정값은 application.properties 또는 배포 환경변수에서 주입!!
+	private static final Logger log = LoggerFactory.getLogger(FestivalService.class);
+	
+	// API 호출에 필요한 설정값은 application.properties 또는 배포 환경변수에서 주입
     @Value("${api.key}")
     private String apiKey;
 
@@ -44,7 +49,8 @@ public class FestivalService {
     // 외부 공공데이터 API에서 행사 XML 데이터를 조회해 Java 객체로 변환
     // 동일한 요청이 반복되지 않도록 결과를 캐시에 저장하고,
     // API 응답 내 중복 행사는 fingerprint 기준으로 제거
-    @Cacheable(value = "festivals", key = "'all'")
+    @Cacheable(value = "festivals", key = "'all'",
+    		unless = "#result == null || #result.getRow() == null || #result.getRow().isEmpty()")
     public FestivalResponse getFestivalData() {
         try {
         	// API URL에 인증키, 페이지 번호, 페이지 크기를 query parameter로 추가
@@ -88,6 +94,8 @@ public class FestivalService {
 
          // 외부 API 오류가 발생해도 서비스 전체가 중단되지 않도록 빈 응답을 반환
         } catch (Exception e) {
+        	log.error("공공데이터 API 조회 실패. apiBaseUrl={}", apiBaseUrl, e);
+
             FestivalResponse empty = new FestivalResponse();
             empty.setRow(List.of());
             return empty;
@@ -113,7 +121,8 @@ public class FestivalService {
                 .filter(festival ->
                         normalize(festival.getTitle()).contains(normalizedKeyword) ||
                         normalize(festival.getInstNm()).contains(normalizedKeyword) ||
-                        normalize(festival.getAddr()).contains(normalizedKeyword)
+                        normalize(festival.getAddr()).contains(normalizedKeyword) ||
+                        normalize(festival.getHostInstNm()).contains(normalizedKeyword)
                 )
                 .collect(Collectors.toList());
     }

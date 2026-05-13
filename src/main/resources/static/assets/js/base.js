@@ -473,7 +473,7 @@ function initializeFestivalCardReveal() {
         festivalCardObserver = null;
     }
 
-    // 운영용 최종 버전
+    // 사용자가 모션 감소 설정을 켠 경우 카드 애니메이션을 비활성화
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reduceMotion) {
