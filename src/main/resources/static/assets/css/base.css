@@ -689,5 +689,11 @@ textarea {
         min-width: 56px;
         height: 52px;
     }
+    .sync-info {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+	}
 }
 

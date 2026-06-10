@@ -195,6 +195,11 @@
 						</div>
 					</div>
 				</div>
+				<div class="sync-info">
+    				마지막 데이터 동기화 :
+    				<span th:text="${#temporals.format(lastSyncTime, 'yyyy-MM-dd HH:mm:ss')}">
+    				</span>
+				</div>
 			</section>
 		</main>
 	</div>

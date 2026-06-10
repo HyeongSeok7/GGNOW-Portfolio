@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 //사용자가 즐겨찾기한 행사를 저장하는 Entity
 @Entity
 @Table(name = "favorite_event", uniqueConstraints = {
-		@UniqueConstraint(name = "uk_favorite_event_username_event_id", columnNames = { "username", "event_id" }) })
+@UniqueConstraint(name = "uk_favorite_event_username_event_id", columnNames = { "username", "event_id" }) })
 public class FavoriteEvent {
 
 	@Id

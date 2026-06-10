@@ -1,284 +1,136 @@
 package com.project.web.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 import java.util.List;
 
-//경기도 공공데이터 API의 XML 응답을 매핑하기 위한 DTO
-//Jackson XmlMapper가 XML 태그명을 Java 필드에 매핑
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FestivalResponse {
 
-	private Head head;
+    @JsonProperty("INFO")
+    private int info;
 
-	// XML 응답에서 row 태그가 별도 wrapper 없이 반복되므로 wrapping을 사용 X
-	@JacksonXmlElementWrapper(useWrapping = false)
-	private List<Row> row;
+    @JsonProperty("DATA")
+    private List<Row> row;
 
-	public Head getHead() {
-		return head;
-	}
+    public int getInfo() {
+        return info;
+    }
 
-	public void setHead(Head head) {
-		this.head = head;
-	}
+    public void setInfo(int info) {
+        this.info = info;
+    }
 
-	public List<Row> getRow() {
-		return row;
-	}
+    public List<Row> getRow() {
+        return row;
+    }
 
-	public void setRow(List<Row> row) {
-		this.row = row;
-	}
+    public void setRow(List<Row> row) {
+        this.row = row;
+    }
 
-	public List<Row> getAllFestivals() {
-		return row;
-	}
+    public List<Row> getAllFestivals() {
+        return row;
+    }
 
-	public static class Head {
-		@JsonProperty("list_total_count")
-		private int list_total_count;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Row {
 
-		@JsonProperty("RESULT")
-		private Result result;
+        @JsonProperty("writer")
+        private String instNm;
 
-		@JsonProperty("api_version")
-		private String apiVersion;
+        @JsonProperty("subject")
+        private String title;
 
-		public int getList_total_count() {
-			return list_total_count;
-		}
+        @JsonProperty("category")
+        private String categoryNm;
 
-		public void setList_total_count(int list_total_count) {
-			this.list_total_count = list_total_count;
-		}
+        @JsonProperty("href")
+        private String url;
 
-		public Result getResult() {
-			return result;
-		}
+        @JsonProperty("thumbnail")
+        private String imageUrl;
 
-		public void setResult(Result result) {
-			this.result = result;
-		}
+        @JsonProperty("startdate")
+        private String beginDe;
 
-		public String getApiVersion() {
-			return apiVersion;
-		}
+        @JsonProperty("intime")
+        private String eventTmInfo;
 
-		public void setApiVersion(String apiVersion) {
-			this.apiVersion = apiVersion;
-		}
-	}
+        @JsonProperty("incost")
+        private String partcptExpnInfo;
 
-	public static class Result {
-		@JsonProperty("CODE")
-		private String code;
+        @JsonProperty("inquiry")
+        private String telnoInfo;
 
-		@JsonProperty("MESSAGE")
-		private String message;
+        @JsonProperty("inarea")
+        private String hostInstNm;
 
-		public String getCode() {
-			return code;
-		}
+        @JsonProperty("homepage")
+        private String hmpgUrl;
 
-		public void setCode(String code) {
-			this.code = code;
-		}
+        @JsonProperty("created")
+        private String writngDe;
 
-		public String getMessage() {
-			return message;
-		}
+        @JsonProperty("address")
+        private String addr;
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
-	}
+        private Long festivalId;
+        private String favoriteId;
 
-	// API 응답의 개별 행사 정보를 나타낸다
-	// festivalId와 favoriteId는 API 원본 필드가 아니라 화면 표시와 내부 기능 연결을 위해 추가한 값이다
-	public static class Row {
-		@JsonProperty("ID")
-		private String id;
+        @JsonProperty("enddate:")
+        private String endDe;
+        
+        public String getEndDe() {return endDe;}
 
-		@JsonProperty("INST_NM")
-		private String instNm;
+        public void setEndDe(String endDe) {this.endDe = endDe;}
+        
+        
 
-		@JsonProperty("TITLE")
-		private String title;
+        public String getInstNm() { return instNm; }
+        public void setInstNm(String instNm) { this.instNm = instNm; }
 
-		@JsonProperty("CATEGORY_NM")
-		private String categoryNm;
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
 
-		@JsonProperty("URL")
-		private String url;
+        public String getCategoryNm() { return categoryNm; }
+        public void setCategoryNm(String categoryNm) { this.categoryNm = categoryNm; }
 
-		@JsonProperty("IMAGE_URL")
-		private String imageUrl;
+        public String getUrl() { return url; }
+        public void setUrl(String url) { this.url = url; }
 
-		@JsonProperty("BEGIN_DE")
-		private String beginDe;
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-		@JsonProperty("END_DE")
-		private String endDe;
+        public String getBeginDe() { return beginDe; }
+        public void setBeginDe(String beginDe) { this.beginDe = beginDe; }
 
-		@JsonProperty("EVENT_TM_INFO")
-		private String eventTmInfo;
+        public String getEventTmInfo() { return eventTmInfo; }
+        public void setEventTmInfo(String eventTmInfo) { this.eventTmInfo = eventTmInfo; }
 
-		@JsonProperty("PARTCPT_EXPN_INFO")
-		private String partcptExpnInfo;
+        public String getPartcptExpnInfo() { return partcptExpnInfo; }
+        public void setPartcptExpnInfo(String partcptExpnInfo) { this.partcptExpnInfo = partcptExpnInfo; }
 
-		@JsonProperty("TELNO_INFO")
-		private String telnoInfo;
+        public String getTelnoInfo() { return telnoInfo; }
+        public void setTelnoInfo(String telnoInfo) { this.telnoInfo = telnoInfo; }
 
-		@JsonProperty("HOST_INST_NM")
-		private String hostInstNm;
+        public String getHostInstNm() { return hostInstNm; }
+        public void setHostInstNm(String hostInstNm) { this.hostInstNm = hostInstNm; }
 
-		@JsonProperty("HMPG_URL")
-		private String hmpgUrl;
+        public String getHmpgUrl() { return hmpgUrl; }
+        public void setHmpgUrl(String hmpgUrl) { this.hmpgUrl = hmpgUrl; }
 
-		@JsonProperty("WRITNG_DE")
-		private String writngDe;
+        public String getWritngDe() { return writngDe; }
+        public void setWritngDe(String writngDe) { this.writngDe = writngDe; }
 
-		@JsonProperty("ADDR")
-		private String addr;
+        public String getAddr() { return addr; }
+        public void setAddr(String addr) { this.addr = addr; }
 
-		private Long festivalId;
-		private String favoriteId;
+        public Long getFestivalId() { return festivalId; }
+        public void setFestivalId(Long festivalId) { this.festivalId = festivalId; }
 
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
-		public String getInstNm() {
-			return instNm;
-		}
-
-		public void setInstNm(String instNm) {
-			this.instNm = instNm;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
-
-		public String getCategoryNm() {
-			return categoryNm;
-		}
-
-		public void setCategoryNm(String categoryNm) {
-			this.categoryNm = categoryNm;
-		}
-
-		public String getUrl() {
-			return url;
-		}
-
-		public void setUrl(String url) {
-			this.url = url;
-		}
-
-		public String getImageUrl() {
-			return imageUrl;
-		}
-
-		public void setImageUrl(String imageUrl) {
-			this.imageUrl = imageUrl;
-		}
-
-		public String getBeginDe() {
-			return beginDe;
-		}
-
-		public void setBeginDe(String beginDe) {
-			this.beginDe = beginDe;
-		}
-
-		public String getEndDe() {
-			return endDe;
-		}
-
-		public void setEndDe(String endDe) {
-			this.endDe = endDe;
-		}
-
-		public String getEventTmInfo() {
-			return eventTmInfo;
-		}
-
-		public void setEventTmInfo(String eventTmInfo) {
-			this.eventTmInfo = eventTmInfo;
-		}
-
-		public String getPartcptExpnInfo() {
-			return partcptExpnInfo;
-		}
-
-		public void setPartcptExpnInfo(String partcptExpnInfo) {
-			this.partcptExpnInfo = partcptExpnInfo;
-		}
-
-		public String getTelnoInfo() {
-			return telnoInfo;
-		}
-
-		public void setTelnoInfo(String telnoInfo) {
-			this.telnoInfo = telnoInfo;
-		}
-
-		public String getHostInstNm() {
-			return hostInstNm;
-		}
-
-		public void setHostInstNm(String hostInstNm) {
-			this.hostInstNm = hostInstNm;
-		}
-
-		public String getHmpgUrl() {
-			return hmpgUrl;
-		}
-
-		public void setHmpgUrl(String hmpgUrl) {
-			this.hmpgUrl = hmpgUrl;
-		}
-
-		public String getWritngDe() {
-			return writngDe;
-		}
-
-		public void setWritngDe(String writngDe) {
-			this.writngDe = writngDe;
-		}
-
-		public String getAddr() {
-			return addr;
-		}
-
-		public void setAddr(String addr) {
-			this.addr = addr;
-		}
-
-		public Long getFestivalId() {
-			return festivalId;
-		}
-
-		public void setFestivalId(Long festivalId) {
-			this.festivalId = festivalId;
-		}
-
-		public String getFavoriteId() {
-			return favoriteId;
-		}
-
-		public void setFavoriteId(String favoriteId) {
-			this.favoriteId = favoriteId;
-		}
-	}
+        public String getFavoriteId() { return favoriteId; }
+        public void setFavoriteId(String favoriteId) { this.favoriteId = favoriteId; }
+    }
 }

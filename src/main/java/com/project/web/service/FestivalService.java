@@ -1,6 +1,5 @@
 package com.project.web.service;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.project.web.model.FestivalResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,16 +18,14 @@ import java.security.NoSuchAlgorithmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 //경기도 공공데이터 API에서 행사 데이터를 가져오고,
 //검색, 상세 조회, 중복 제거, 내부 식별키 생성을 담당하는 서비스
 @Service
 public class FestivalService {
 
 	private static final Logger log = LoggerFactory.getLogger(FestivalService.class);
-
-	// API 호출에 필요한 설정값은 application.properties 또는 배포 환경변수에서 주입
-	@Value("${api.key}")
-	private String apiKey;
 
 	@Value("${api.base-url}")
 	private String apiBaseUrl;
@@ -52,14 +49,22 @@ public class FestivalService {
 	public FestivalResponse getFestivalData() {
 		try {
 			// API URL에 인증키, 페이지 번호, 페이지 크기를 query parameter로 추가
-			String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl).queryParam("KEY", apiKey)
-					.queryParam("pIndex", pageIndex).queryParam("pSize", pageSize).build(true).toUriString();
-
+			String url = UriComponentsBuilder
+			        .fromHttpUrl(apiBaseUrl)
+			        .queryParam("page", pageIndex)
+			        .queryParam("perpage", pageSize)
+			        .build(true)
+			        .toUriString();
 			String response = restTemplate.getForObject(url, String.class);
 
 			// 공공데이터 API의 XML 응답을 FestivalResponse 객체로 매핑한다.
-			XmlMapper xmlMapper = new XmlMapper();
-			FestivalResponse festivalResponse = xmlMapper.readValue(response, FestivalResponse.class);
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			FestivalResponse festivalResponse =
+			        objectMapper.readValue(
+			                response,
+			                FestivalResponse.class
+			        );
 
 			if (festivalResponse != null && festivalResponse.getAllFestivals() != null) {
 				List<FestivalResponse.Row> distinctFestivals = festivalResponse.getAllFestivals().stream()

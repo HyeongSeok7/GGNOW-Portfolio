@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 //내부 행사 식별자 관리를 위한 Repository
@@ -13,6 +14,10 @@ import java.util.Optional;
 public interface FestivalRepository extends JpaRepository<FestivalEntity, Long> {
 
 	Optional<FestivalEntity> findByIdentityKey(String identityKey);
+	
+	List<FestivalEntity> findAllByOrderByIdDesc();
+	
+	List<FestivalEntity> findAllByOrderByBeginDeDesc();
 
 	@Modifying
 	@Query(value = """
