@@ -1,6 +1,9 @@
 package com.project.web.service;
 
+import com.project.web.model.FestivalEntity;
 import com.project.web.model.FestivalResponse;
+import com.project.web.repository.FestivalRepository;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -37,9 +40,14 @@ public class FestivalService {
 	private int pageSize;
 
 	private final RestTemplate restTemplate;
+	private final FestivalRepository festivalRepository;
+	
+	public FestivalService(
+	        RestTemplate restTemplate,
+	        FestivalRepository festivalRepository) {
 
-	public FestivalService(RestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
+	    this.restTemplate = restTemplate;
+	    this.festivalRepository = festivalRepository;
 	}
 
 	// 외부 공공데이터 API에서 행사 XML 데이터를 조회해 Java 객체로 변환
@@ -275,5 +283,19 @@ public class FestivalService {
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalStateException("SHA-256 algorithm not available", e);
 		}
+	}
+	
+	public List<FestivalEntity> getFestivalsFromDb() {
+
+	    return festivalRepository
+	            .findAllByOrderByBeginDeDesc();
+	}
+	
+	public List<FestivalEntity> getByCategory(
+	        String category) {
+
+	    return festivalRepository
+	            .findByCategoryNmOrderByBeginDeDesc(
+	                    category);
 	}
 }

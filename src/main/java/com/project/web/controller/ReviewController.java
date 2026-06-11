@@ -52,7 +52,7 @@ public class ReviewController {
 	// 리뷰 내용 수정
 	// ReviewService에서 festivalId 일치 여부와 작성자 본인 여부를 검증
 	@PatchMapping("/{reviewId}")
-	public ResponseEntity<Map<String, String>> updateReview(@PathVariable Long festivalId, @PathVariable Long reviewId,
+	public ResponseEntity<Map<String, String>> updateReview(@PathVariable("festivalId") Long festivalId, @PathVariable("reviewId") Long reviewId,
 			@RequestBody ReviewUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
 		if (userDetails == null) {
 			return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다!"));

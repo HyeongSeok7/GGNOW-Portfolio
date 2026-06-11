@@ -115,7 +115,7 @@
 
 						<div class="info-item">
 							<span class="info-label">장소</span> <strong
-								th:text="${festival.addr != null && !#strings.isEmpty(festival.addr) ? festival.addr : '공식 홈페이지 참고'}">장소</strong>
+								th:text="${festival.address != null && !#strings.isEmpty(festival.address) ? festival.address : '공식 홈페이지 참고'}">장소</strong>
 						</div>
 
 						<div class="info-item">
@@ -150,8 +150,8 @@
 								th:href="${festival.hmpgUrl}" target="_blank"
 								rel="noopener noreferrer" class="detail-link-btn"> 공식 홈페이지
 								이동 </a> <a
-								th:if="${festival.url != null && !#strings.isEmpty(festival.url)}"
-								th:href="${festival.url}" target="_blank"
+								th:if="${festival.homepage != null && !#strings.isEmpty(festival.homepage)}"
+								th:href="${festival.homepage}" target="_blank"
 								rel="noopener noreferrer" class="detail-link-btn secondary">
 								원본 링크 보기 </a> <a href="/main" class="detail-link-btn secondary">
 								다른 행사 더 보기 </a>

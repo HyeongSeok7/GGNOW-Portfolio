@@ -74,31 +74,36 @@ public class FestivalController {
 		}
 	}
 
-	// 내부 festivalId 기준 상세 페이지 조회
-	// DB에는 identityKey만 저장, 실제 화면에 보여줄 상세 데이터는 최신 외부 API 응답에서 다시 찾는다
 	@GetMapping("/festival/id/{festivalId}")
-	public String festivalDetailById(@PathVariable("festivalId") Long festivalId, Model model, Principal principal) {
-		try {
-			// festivalId로 내부 식별 정보를 먼저 조회
-			FestivalEntity entity = festivalRepository.findById(festivalId)
-					.orElseThrow(() -> new IllegalArgumentException("Festival not found id=" + festivalId));
+	public String festivalDetailById(
+	        @PathVariable("festivalId") Long festivalId,
+	        Model model,
+	        Principal principal) {
 
-			// DB에 저장된 identityKey와 외부 API Row의 identityKey를 비교해
-			// 현재 API 응답 중 같은 행사를 찾아 상세 페이지에 전달
-			FestivalResponse.Row festival = festivalService.getFestivalData().getRow().stream()
-					.filter(row -> festivalService.createFestivalIdentityKey(row).equals(entity.getIdentityKey()))
-					.findFirst().orElseThrow(() -> new IllegalArgumentException(
-							"Festival not found by identityKey: " + entity.getIdentityKey()));
+	    try {
 
-			model.addAttribute("festivalId", festivalId);
-			model.addAttribute("festival", festival);
-			model.addAttribute("currentUsername", principal != null ? principal.getName() : "");
+	        FestivalEntity entity =
+	                festivalRepository.findById(festivalId)
+	                        .orElseThrow(
+	                                () -> new IllegalArgumentException(
+	                                        "Festival not found id=" + festivalId));
 
-			return "festivalDetail";
-		} catch (Exception e) {
-			log.error("Festival detail page failed. festivalId={}", festivalId, e);
-			return "error";
-		}
+	        model.addAttribute("festivalId", festivalId);
+	        model.addAttribute("festival", entity);
+	        model.addAttribute(
+	                "currentUsername",
+	                principal != null ? principal.getName() : "");
+
+	        return "festivalDetail";
+
+	    } catch (Exception e) {
+	        log.error(
+	                "Festival detail page failed. festivalId={}",
+	                festivalId,
+	                e);
+
+	        return "error";
+	    }
 	}
 
 	// 로그인한 사용자가 특정 행사를 즐겨찾기에 추가

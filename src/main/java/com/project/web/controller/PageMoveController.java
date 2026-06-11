@@ -31,15 +31,11 @@ public class PageMoveController {
 	@GetMapping("/culture")
 	public String moveCulturePage(Model model) {
 
-	    FestivalResponse festivalResponse =
-	            festivalService.getFestivalData();
-
-	    attachFestivalIds(festivalResponse);
-
-	    model.addAttribute(
-	            "festivalData",
-	            festivalResponse);
-
+		model.addAttribute(
+		        "festivalData",
+		        festivalService.getByCategory("행사")
+		);
+		
 	    addLastSyncTime(model);
 	    return "culture";
 	}
@@ -48,14 +44,10 @@ public class PageMoveController {
 	@GetMapping("/education")
 	public String moveEducationPage(Model model) {
 
-	    FestivalResponse festivalResponse =
-	            festivalService.getFestivalData();
-
-	    attachFestivalIds(festivalResponse);
-
-	    model.addAttribute(
-	            "festivalData",
-	            festivalResponse);
+		model.addAttribute(
+		        "festivalData",
+		        festivalService.getByCategory("교육")
+		);
 
 	    addLastSyncTime(model);
 	    return "education";
@@ -65,14 +57,10 @@ public class PageMoveController {
 	@GetMapping("/exhibition")
 	public String moveExhibitionPage(Model model) {
 
-	    FestivalResponse festivalResponse =
-	            festivalService.getFestivalData();
-
-	    attachFestivalIds(festivalResponse);
-
-	    model.addAttribute(
-	            "festivalData",
-	            festivalResponse);
+		model.addAttribute(
+		        "festivalData",
+		        festivalService.getByCategory("전시")
+		);
 
 	    addLastSyncTime(model);
 	    return "exhibition";
@@ -82,14 +70,10 @@ public class PageMoveController {
 	@GetMapping("/performance")
 	public String movePerformancePage(Model model) {
 
-	    FestivalResponse festivalResponse =
-	            festivalService.getFestivalData();
-
-	    attachFestivalIds(festivalResponse);
-
-	    model.addAttribute(
-	            "festivalData",
-	            festivalResponse);
+		model.addAttribute(
+		        "festivalData",
+		        festivalService.getByCategory("공연")
+		);
 
 	    addLastSyncTime(model);
 	    return "performance";

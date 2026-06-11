@@ -18,6 +18,9 @@ public interface FestivalRepository extends JpaRepository<FestivalEntity, Long> 
 	List<FestivalEntity> findAllByOrderByIdDesc();
 	
 	List<FestivalEntity> findAllByOrderByBeginDeDesc();
+	
+	List<FestivalEntity> findByCategoryNmOrderByBeginDeDesc(
+	        String categoryNm);
 
 	@Modifying
 	@Query(value = """

@@ -26,6 +26,7 @@ public class SearchController {
 	// 사용자가 입력한 키워드로 행사 제목, 기관명, 주소를 검색
 	// 검색 결과마다 festivalId를 세팅해 상세 페이지 URL에서 사용할 수 있게 한다
 	@GetMapping("/search")
+	
 	public String searchFestivals(@RequestParam("keyword") String keyword, Model model) {
 		List<FestivalResponse.Row> filterFestivals = festivalService.searchFestivals(keyword);
 

@@ -97,7 +97,7 @@
 			</section>
 
 			<section class="event-list-wrap"
-				th:with="educationEvents=${festivalData != null and festivalData.row != null ? festivalData.row.?[categoryNm != null and #strings.trim(categoryNm) == '교육'] : null}">
+         		th:with="educationEvents=${festivalData}">
 				<div class="section-intro">
 					<p class="section-kicker">EVENT LIST</p>
 					<h2>지금 확인할 수 있는 교육 행사</h2>
@@ -145,7 +145,7 @@
 								<img
 									th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
 									alt="축제 이미지"> <span class="star-icon"
-									th:data-event-id="${festival.festivalId}">&#9733;</span>
+									th:data-event-id="${festival.id}">&#9733;</span>
 							</div>
 
 							<div class="dreamy-card-body">
@@ -190,11 +190,16 @@
 								</p>
 
 								<a
-									th:href="@{/festival/id/{festivalId}(festivalId=${festival.festivalId})}"
+									th:href="@{/festival/id/{festivalId}(festivalId=${festival.id})}"
 									class="dreamy-detail-btn">상세 보기</a>
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="sync-info">
+    				마지막 데이터 동기화 :
+    				<span th:text="${#temporals.format(lastSyncTime, 'yyyy-MM-dd HH:mm:ss')}">
+    				</span>
 				</div>
 			</section>
 		</main>
