@@ -197,9 +197,17 @@
 					</div>
 				</div>
 				<div class="sync-info">
-    				마지막 데이터 동기화 :
-    				<span th:text="${#temporals.format(lastSyncTime, 'yyyy-MM-dd HH:mm:ss')}">
-    				</span>
+				    <div class="sync-line"></div>
+				    <div class="sync-badge">
+				        <span class="sync-dot"></span>
+				        <span class="sync-text">
+				            최신 행사 정보를 반영했어요
+				        </span>
+				        <span class="sync-date"
+				              th:text="${#temporals.format(lastSyncTime,'yyyy.MM.dd HH:mm')}">
+				        </span>
+				    </div>
+				    <div class="sync-line"></div>
 				</div>
 			</section>
 		</main>

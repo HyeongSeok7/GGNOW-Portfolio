@@ -689,11 +689,51 @@ textarea {
         min-width: 56px;
         height: 52px;
     }
-    .sync-info {
-    margin-top: 40px;
-    text-align: center;
-    font-size: 14px;
-    color: #666;
-	}
+    
 }
+
+.sync-info{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin:24px 0;
+	}
+
+	.sync-line{
+	    flex:1;
+	    height:1px;
+	    background:#ece8ff;
+	}
+	
+	.sync-badge{
+	    display:flex;
+	    align-items:center;
+	    gap:10px;
+	
+	    padding:10px 16px;
+	
+	    background:#f7f4ff;
+	
+	    border:1px solid #e5ddff;
+	
+	    border-radius:999px;
+	}
+	
+	.sync-dot{
+	    width:8px;
+	    height:8px;
+	
+	    border-radius:50%;
+	    background:#735cff;
+	}
+	
+	.sync-text{
+	    font-size:14px;
+	    color:#555;
+	}
+	
+	.sync-date{
+	    font-size:13px;
+	    color:#999;
+	}
 
