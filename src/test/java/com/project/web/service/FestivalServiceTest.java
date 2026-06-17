@@ -26,7 +26,7 @@ class FestivalServiceTest {
      * - normalize(), createFestivalIdentityKey() 같은 순수 로직만 검증하면 됩니다.
      * - 그래서 더 빠르고 가볍게 실행할 수 있는 단위 테스트 형태로 작성했습니다.
      */
-    private final FestivalService festivalService = new FestivalService(new RestTemplate());
+	private final FestivalService festivalService = new FestivalService(new RestTemplate(),null);
 
     @Test
     @DisplayName("normalize는 공백과 대부분의 특수문자를 제거하고 영문을 소문자로 변환한다")
