@@ -11,7 +11,8 @@ public class FestivalEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// 제목, 날짜, 시간, 주소, 참가비 등을 조합한 fingerprint를 SHA-256으로 변환한 고유 키
+	// 신규/갱신 행사는 GGC 원본 문서 ID 기반 SHA-256 키를 사용한다.
+	// 기존 DB id는 유지한다.
 	@Column(name = "identity_key", nullable = false, length = 64)
 	private String identityKey;
 
@@ -54,6 +55,8 @@ public class FestivalEntity {
 	@Column(name = "hmpg_url", length = 1000)
 	private String hmpgUrl;
 	
+	@Column(nullable = false)
+	private boolean active = true;
 	
 	public String getCategoryNm() {
 		return categoryNm;
@@ -173,5 +176,12 @@ public class FestivalEntity {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public boolean isActive() {
+	    return active;
+	}
+
+	public void setActive(boolean active) {
+	    this.active = active;
 	}
 }

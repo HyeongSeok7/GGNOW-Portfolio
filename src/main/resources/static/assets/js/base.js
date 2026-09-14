@@ -1,5 +1,3 @@
-console.log('BASE_JS_FILE_LOADED_v4_0');
-
 function getCsrfInfo() {
 	const tokenMeta = document.querySelector('meta[name="_csrf"]');
 	const headerMeta = document.querySelector('meta[name="_csrf_header"]');
@@ -101,24 +99,38 @@ function normalizeFestivalTitles() {
 }
 
 function bindLogoutButton() {
-	const logoutBtn = document.getElementById('logoutBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-	if (!logoutBtn) return;
+    if (!logoutBtn) return;
 
-	logoutBtn.addEventListener('click', function() {
-		fetch('/logout', {
-			method: 'POST',
-			credentials: 'same-origin',
-			headers: createCsrfHeaders({})
-		})
-			.then(function() {
-				window.location.href = '/main';
-			})
-			.catch(function(err) {
-				console.error('로그아웃 오류:', err);
-				window.location.href = '/main';
-			});
-	});
+    logoutBtn.addEventListener('click', async function() {
+        logoutBtn.disabled = true;
+
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: createCsrfHeaders({})
+            });
+
+            if (!response.ok) {
+                alert(
+                    '로그아웃하지 못했습니다. ' +
+                    '페이지를 새로고침한 후 다시 시도해주세요.'
+                );
+                return;
+            }
+
+            window.location.href = '/main';
+
+        } catch (error) {
+            console.error('로그아웃 오류:', error);
+            alert('서버에 연결하지 못했습니다. 다시 시도해주세요.');
+
+        } finally {
+            logoutBtn.disabled = false;
+        }
+    });
 }
 
 function updateAuthSection(isLoggedIn) {

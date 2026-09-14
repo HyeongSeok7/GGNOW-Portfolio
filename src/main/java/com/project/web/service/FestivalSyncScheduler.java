@@ -1,132 +1,74 @@
 package com.project.web.service;
 
-import com.project.web.model.FestivalEntity;
-import com.project.web.model.FestivalResponse;
-import com.project.web.model.SyncStatus;
-import com.project.web.repository.FestivalRepository;
-import com.project.web.repository.SyncStatusRepository;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
-
-import javax.sql.DataSource;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FestivalSyncScheduler {
 
-	
-private final FestivalService festivalService;
-private final FestivalRepository festivalRepository;
-private final SyncStatusRepository syncStatusRepository;
-private final DataSource dataSource;
-public FestivalSyncScheduler(
-        FestivalService festivalService,
-        FestivalRepository festivalRepository,
-        SyncStatusRepository syncStatusRepository,
-        DataSource dataSource) {
+    private static final Logger log =
+            LoggerFactory.getLogger(FestivalSyncScheduler.class);
 
-    this.festivalService = festivalService;
-    this.festivalRepository = festivalRepository;
-    this.syncStatusRepository = syncStatusRepository;
-    this.dataSource = dataSource;
-}
-@PersistenceContext
-private EntityManager em;
+    private final FestivalService festivalService;
+    private final FestivalSyncWriter festivalSyncWriter;
 
-@Scheduled(cron = "0 0 0 * * *")
-@Transactional
-public void syncFestivalData() {
+    // 같은 서버 프로세스 안에서 동기화가 겹치는 것을 방지한다.
+    private final AtomicBoolean running =
+            new AtomicBoolean(false);
 
-	System.out.println(
-		    "DB = " +
-		    em.createNativeQuery("SELECT DATABASE()")
-		      .getSingleResult()
-		);
-	
-	try {
-        System.out.println(
-            "DB URL = "
-            + dataSource.getConnection()
-                        .getMetaData()
-                        .getURL()
-        );
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-	
-    FestivalResponse response =
-            festivalService.getFestivalData();
-
-    if (response == null ||
-            response.getRow() == null) {
-        return;
+    public FestivalSyncScheduler(
+            FestivalService festivalService,
+            FestivalSyncWriter festivalSyncWriter
+    ) {
+        this.festivalService = festivalService;
+        this.festivalSyncWriter = festivalSyncWriter;
     }
 
-    for (FestivalResponse.Row row :
-            response.getRow()) {
+    // 시작 10초 후 최초 실행
+    @Scheduled(
+            initialDelay = 10_000,
+            fixedDelay = Long.MAX_VALUE
+    )
 
-        String identityKey =
-                festivalService
-                        .createFestivalIdentityKey(row);
+    // 이후 한국 시간 기준 매일 자정 실행
+    @Scheduled(
+            cron = "0 0 0 * * *",
+            zone = "Asia/Seoul"
+    )
+    public void syncFestivalData() {
+        if (!running.compareAndSet(false, true)) {
+            log.warn(
+                    "이미 동기화 중이므로 이번 실행을 건너뜁니다."
+            );
+            return;
+        }
 
-        FestivalEntity entity =
-                festivalRepository
-                        .findByIdentityKey(identityKey)
-                        .orElse(new FestivalEntity());
+        try {
+            // API 호출 실패와 관계없이 종료일 경과 처리는 수행한다.
+            festivalSyncWriter.hideEndedFestivals();
 
-        entity.setIdentityKey(identityKey);
-        entity.setNormalizedTitle(
-                festivalService.normalize(
-                        row.getTitle()));
+            // DB 저장 트랜잭션 밖에서 전체 페이지를 수집한다.
+            var snapshot = festivalService.getFestivalData();
 
-        entity.setTitle(row.getTitle());
+            // 전체 수집에 성공한 경우에만 DB에 반영한다.
+            int count =
+                    festivalSyncWriter.applySnapshot(snapshot);
 
-        entity.setImageUrl(row.getImageUrl());
-        entity.setHomepage(row.getHmpgUrl());
-        entity.setAddress(row.getAddr());
-        entity.setHostInstNm(row.getHostInstNm());
+            log.info("행사 동기화 성공: {}건", count);
 
-        entity.setBeginDe(row.getBeginDe());
-        entity.setEndDe(row.getEndDe());
+        } catch (Exception e) {
+            log.error(
+                    "행사 동기화 실패. API 결과 반영은 중단하고 기존 데이터를 유지합니다."
+                            + " 종료일 경과 처리는 별도입니다.",
+                    e
+            );
 
-        entity.setEventTmInfo(
-                row.getEventTmInfo());
-
-        entity.setPartcptExpnInfo(
-                row.getPartcptExpnInfo());
-
-        entity.setCategoryNm(row.getCategoryNm());
-
-        entity.setEventTmInfo(
-                row.getEventTmInfo());
-
-        entity.setPartcptExpnInfo(
-                row.getPartcptExpnInfo());
-
-        entity.setTelnoInfo(
-                row.getTelnoInfo());
-
-        entity.setHmpgUrl(
-                row.getHmpgUrl());
-        
-        festivalRepository.saveAndFlush(entity);
+        } finally {
+            running.set(false);
+        }
     }
-    
-    SyncStatus status =
-            syncStatusRepository
-                    .findById(1L)
-                    .orElse(new SyncStatus());
-
-    status.setId(1L);
-
-    status.setLastSuccessTime(
-            java.time.LocalDateTime.now());
-
-    syncStatusRepository.save(status);
-}
-
 }

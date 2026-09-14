@@ -2,16 +2,12 @@ package com.project.web.controller;
 
 import com.project.web.dto.ChangePasswordRequest;
 import com.project.web.model.FavoriteEvent;
-import com.project.web.model.FestivalResponse;
 import com.project.web.model.User;
 import com.project.web.repository.FavoriteEventRepository;
-import com.project.web.service.FestivalIdentityService;
-import com.project.web.service.FestivalService;
 import com.project.web.service.ReviewService;
 import com.project.web.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -20,10 +16,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import com.project.web.model.FestivalEntity;
+import com.project.web.repository.FestivalRepository;
+
+import java.util.Objects;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //마이페이지 관련 화면을 담당하는 컨트롤러
 //사용자 정보, 즐겨찾기 행사, 내가 작성한 리뷰, 비밀번호 변경 기능을 처리
@@ -32,18 +31,19 @@ public class MyPageController {
 
 	private final UserService userService;
 	private final FavoriteEventRepository favoriteEventRepository;
-	private final FestivalService festivalService;
 	private final ReviewService reviewService;
-	private final FestivalIdentityService festivalIdentityService;
+	private final FestivalRepository festivalRepository;
 
-	public MyPageController(UserService userService, FavoriteEventRepository favoriteEventRepository,
-			FestivalService festivalService, ReviewService reviewService,
-			FestivalIdentityService festivalIdentityService) {
-		this.userService = userService;
-		this.favoriteEventRepository = favoriteEventRepository;
-		this.festivalService = festivalService;
-		this.reviewService = reviewService;
-		this.festivalIdentityService = festivalIdentityService;
+	public MyPageController(
+	        UserService userService,
+	        FavoriteEventRepository favoriteEventRepository,
+	        ReviewService reviewService,
+	        FestivalRepository festivalRepository
+	) {
+	    this.userService = userService;
+	    this.favoriteEventRepository = favoriteEventRepository;
+	    this.reviewService = reviewService;
+	    this.festivalRepository = festivalRepository;
 	}
 
 	// 로그인한 사용자의 기본 정보와 즐겨찾기 행사 목록을 조회해 마이페이지에 전달
@@ -55,37 +55,22 @@ public class MyPageController {
 		User user = userService.getUserByUsername(username); // 사용자 이름을 기반으로 사용자 정보를 가져온다
 		model.addAttribute("user", user); // 사용자 정보를 모델에 추가하여 뷰로 전달
 
-		// favorite_event 테이블에는 사용자가 저장한 행사 식별값만 있으므로,
-		// 외부 API 행사 목록과 다시 매칭해 화면에 표시할 상세 정보를 구성
-		List<FavoriteEvent> favoriteEvents = favoriteEventRepository.findAllByUsername(username);
-
 		// 즐겨찾기 이벤트의 ID 목록 추출
-		List<String> favoriteEventIds = favoriteEvents.stream().map(FavoriteEvent::getEventId) // FavoriteEvent 객체에서
-																								// eventID 필드 값 추출
-				.collect(Collectors.toList()); // 스트림 결과를 리스트로 변환
+		List<Long> favoriteFestivalIds =
+		        favoriteEventRepository.findAllByUsername(username)
+		                .stream()
+		                .map(FavoriteEvent::getEventId)
+		                .map(this::parseFestivalId)
+		                .filter(Objects::nonNull)
+		                .toList();
 
-		// 즐겨찾기 이벤트의 상세 정보를 조회
-		List<FestivalResponse.Row> favoriteEventDetails = festivalService.getFestivalData().getRow().stream()
-				.map(event -> {
-					// 외부 API Row마다 내부 festivalId를 붙여 상세 페이지 이동과 즐겨찾기 비교에 사용
-					Long festivalId = festivalIdentityService.getOrCreateFestivalId(
-							festivalService.createFestivalIdentityKey(event),
-							festivalService.normalize(event.getTitle()), event.getTitle());
-					event.setFestivalId(festivalId);
-
-					String fidKey = String.valueOf(festivalId);
-					String favoriteId = null;
-
-					// 현재 구조에서는 festivalId를 기준으로 즐겨찾기를 비교
-					// 기존에 제목 기반으로 저장된 데이터가 있을 수 있어 title 비교도 보조적으로 유지
-					if (favoriteEventIds.contains(fidKey))
-						favoriteId = fidKey;
-					else if (favoriteEventIds.contains(event.getTitle()))
-						favoriteId = event.getTitle();
-
-					event.setFavoriteId(favoriteId);
-					return event;
-				}).filter(event -> event.getFavoriteId() != null).collect(Collectors.toList());// 필터링 결과를 리스트로 변환
+		List<FestivalEntity> favoriteEventDetails =
+		        favoriteFestivalIds.isEmpty()
+		                ? List.of()
+		                : festivalRepository
+		                        .findByIdInAndActiveTrueOrderByBeginDeDesc(
+		                                favoriteFestivalIds
+		                        );
 
 		// 즐겨찾기 이벤트 상세 정보를 모델에 추가
 		model.addAttribute("favoriteEvents", favoriteEventDetails);
@@ -144,5 +129,12 @@ public class MyPageController {
 			model.addAttribute("changePasswordRequest", form);
 			return "change-password";
 		}
+	}
+	private Long parseFestivalId(String eventId) {
+	    try {
+	        return Long.valueOf(eventId);
+	    } catch (NumberFormatException e) {
+	        return null;
+	    }
 	}
 }

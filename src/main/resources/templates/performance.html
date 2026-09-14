@@ -31,7 +31,7 @@
 			<nav class="sidebar-nav">
 				<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
 					href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
-					href="/exhibition">전시행사</a>
+					href="/exhibition">전시행사</a> <a href="/ended">종료된행사</a>
 			</nav>
 			<div class="footer">
 				<img src="/images/banner.png" alt="변화의 중심, 기회의 경기">
@@ -43,7 +43,8 @@
 				<nav>
 					<a href="/main">메인페이지</a> <a href="/performance">공연행사</a> <a
 						href="/education">교육행사</a> <a href="/culture">문화행사</a> <a
-						href="/exhibition">전시행사</a> <a href="/customer">고객센터</a>
+						href="/exhibition">전시행사</a> <a href="/customer">고객센터</a> <a
+						href="/ended">종료된행사</a>
 				</nav>
 				<div class="auth" id="authSection">
 					<a href="/login"><span>로그인 / 회원가입</span></a>
@@ -90,10 +91,21 @@
 				</div>
 
 				<div class="event-sort-box">
-					<label for="sortOption">정렬 기준</label> <select id="sortOption">
-						<option value="latest">최신순</option>
-						<option value="deadline">마감임박순</option>
+					<label for="sortOption">정렬 기준</label> 
+					<select id="serverSortOption">
+					    <option value="latest" th:selected="${sort == 'latest'}">최신순</option>
+						<option value="deadline" th:selected="${sort == 'deadline'}">마감임박순</option>
 					</select>
+				</div>
+				
+				<div class="event-sort-box">
+				    <label for="serverPageSize">페이지당 표시 수</label>
+				
+				    <select id="serverPageSize">
+				        <option value="16" th:selected="${size == 16}"> 16개씩 보기</option>
+				
+				        <option value="32" th:selected="${size == 32}"> 32개씩 보기</option>
+				    </select>
 				</div>
 			</section>
 
@@ -142,10 +154,9 @@
 
 						<div class="festival-info dreamy-festival-info">
 							<div class="image-container dreamy-image-container">
-								<img
-									th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
-									alt="축제 이미지"> <span class="star-icon"
-									th:data-event-id="${festival.id}">&#9733;</span>
+								<img loading="lazy" decoding="async" th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
+								     alt="축제 이미지"> 
+								    <span class="star-icon" th:data-event-id="${festival.id}">&#9733;</span>
 							</div>
 
 							<div class="dreamy-card-body">
@@ -196,6 +207,49 @@
 						</div>
 					</div>
 				</div>
+				
+				<nav class="festival-pagination"
+				     th:if="${festivalPage.totalPages > 1}"
+				     aria-label="행사 페이지 이동">
+				
+				    <a th:if="${!festivalPage.first}"
+				       th:href="@{${basePath}(
+				           page=${festivalPage.number - 1},
+				           size=${size},
+				           sort=${sort}
+				       )}">
+				        ‹
+				    </a>
+				
+				    <span th:if="${festivalPage.first}"
+				          class="is-disabled">
+				        ‹
+				    </span>
+				
+				    <a th:each="pageNumber : ${#numbers.sequence(0, festivalPage.totalPages - 1)}"
+				       th:href="@{${basePath}(
+				           page=${pageNumber},
+				           size=${size},
+				           sort=${sort}
+				       )}"
+				       th:text="${pageNumber + 1}"
+				       th:classappend="${pageNumber == festivalPage.number} ? 'is-active' : ''">
+				    </a>
+				
+				    <a th:if="${!festivalPage.last}"
+				       th:href="@{${basePath}(
+				           page=${festivalPage.number + 1},
+				           size=${size},
+				           sort=${sort}
+				       )}">
+				        ›
+				    </a>
+				
+				    <span th:if="${festivalPage.last}"
+				          class="is-disabled">
+				        ›
+				    </span>
+				</nav>
 				<div class="sync-info">
 				    <div class="sync-line"></div>
 				    <div class="sync-badge">
@@ -215,5 +269,6 @@
 
 
 	<script src="/assets/js/base.js?v=4.0"></script>
+	<script src="/assets/js/festival-pagination.js?v=1.0"></script>
 </body>
 </html>

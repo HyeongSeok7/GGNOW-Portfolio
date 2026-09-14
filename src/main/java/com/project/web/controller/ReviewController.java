@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import com.project.web.service.FestivalWriteGuard;
+
 //행사 상세 페이지에서 사용하는 리뷰 REST API 컨트롤러
 //리뷰 조회는 비회원도 가능하지만, 작성/수정/삭제는 로그인 사용자만 가능
 @RestController
@@ -45,8 +47,17 @@ public class ReviewController {
 			return ResponseEntity.badRequest().body(Map.of("message", "리뷰 내용을 입력해주세요!"));
 		}
 
-		reviewService.addReviewByFestivalId(festivalId, content.trim(), userDetails.getUsername());
-		return ResponseEntity.status(201).body(Map.of("message", "리뷰를 등록했습니다!"));
+		try {
+		    reviewService.addReviewByFestivalId(festivalId, content.trim(), userDetails.getUsername()
+		    );
+
+		    return ResponseEntity.status(201)
+		            .body(Map.of("message", "리뷰를 등록했습니다!"));
+
+		} catch (IllegalArgumentException e) {
+		    return ResponseEntity.status(404)
+		            .body(Map.of("message", "행사를 찾을 수 없습니다."));
+		}
 	}
 
 	// 리뷰 내용 수정
@@ -98,4 +109,13 @@ public class ReviewController {
 			return ResponseEntity.status(403).body(Map.of("message", "작성자만 삭제할 수 있습니다."));
 		}
 	}
+	
+	@ExceptionHandler(FestivalWriteGuard.WriteNotAllowedException.class)
+	public ResponseEntity<Map<String, String>> handleWriteNotAllowed(
+	        FestivalWriteGuard.WriteNotAllowedException e) {
+
+	    return ResponseEntity.status(409)
+	            .body(Map.of("message", e.getMessage()));
+	}
+	
 }

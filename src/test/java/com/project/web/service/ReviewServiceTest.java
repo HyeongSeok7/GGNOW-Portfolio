@@ -65,6 +65,15 @@ class ReviewServiceTest {
 	@Test
 	void 리뷰수정_성공() {
 
+		FestivalEntity festival = new FestivalEntity();
+		festival.setId(1L);
+		festival.setTitle("테스트 행사");
+		festival.setActive(true);
+		festival.setEndDe("2099-12-31");
+
+		when(festivalRepository.findById(1L))
+		        .thenReturn(Optional.of(festival));
+		
 		//기존 리뷰 생성
 	    Review review = new Review();
 
@@ -124,6 +133,15 @@ class ReviewServiceTest {
 	@Test
 	void 리뷰삭제_성공() {
 
+		FestivalEntity festival = new FestivalEntity();
+		festival.setId(1L);
+		festival.setTitle("테스트 행사");
+		festival.setActive(true);
+		festival.setEndDe("2099-12-31");
+
+		when(festivalRepository.findById(1L))
+		        .thenReturn(Optional.of(festival));
+		
 		//삭제 대상 리뷰 생성
 	    Review review = new Review();
 
@@ -143,6 +161,31 @@ class ReviewServiceTest {
 	    //삭제 메소드 호출 여부 검증
 	    verify(reviewRepository)
 	            .delete(review);
+	}
+	
+	@Test
+	void 종료행사_리뷰작성_차단() {
+
+	    FestivalEntity festival = new FestivalEntity();
+	    festival.setId(1L);
+	    festival.setTitle("종료된 행사");
+	    festival.setActive(true);
+	    festival.setEndDe("2025-01-01");
+
+	    when(festivalRepository.findById(1L))
+	            .thenReturn(Optional.of(festival));
+
+	    assertThrows(
+	            FestivalWriteGuard.WriteNotAllowedException.class,
+	            () -> reviewService.addReviewByFestivalId(
+	                    1L,
+	                    "새 리뷰",
+	                    "tester"
+	            )
+	    );
+
+	    verify(reviewRepository, never())
+	            .save(any(Review.class));
 	}
 	
 }

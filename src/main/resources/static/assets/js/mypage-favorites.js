@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                // ✅ 화면에서 카드 제거
+                //  화면에서 카드 제거
                 const card = btn.closest(".event-card");
                 if (card) card.remove();
 
-                // ✅ 모두 제거되면 빈 상태 메시지 보여주기(선택)
+                //  모두 제거되면 빈 상태 메시지 보여주기
                 const list = document.querySelector(".favorites-section");
                 const remaining = document.querySelectorAll(".event-card").length;
                 if (list && remaining === 0) {

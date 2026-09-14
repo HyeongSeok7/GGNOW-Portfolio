@@ -22,8 +22,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      API_BASE_URL: https://openapi.gg.go.kr/GGCULTUREVENTSTUS
-      API_KEY: 여기에_네_실제_API_KEY
+      API_BASE_URL: https://ggc.ggcf.kr/open/json/playongoing
+      API_PAGE_SIZE: 100
+      API_MAX_PAGES: 100
       DB_URL: jdbc:mariadb://db:3306/ggnow
       DB_USER: ggnow_user
       DB_PASSWORD: ggnow_pass

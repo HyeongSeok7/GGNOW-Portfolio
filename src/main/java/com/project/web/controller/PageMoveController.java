@@ -9,8 +9,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-//카테고리별 행사 목록 페이지 이동을 담당하는 컨트롤러
-//각 페이지에 외부 API 행사 데이터와 내부 festivalId를 함께 전달
+import com.project.web.model.FestivalEntity;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.RequestParam;
+
+/**
+ * 행사 카테고리·종료 행사 목록 화면을 구성하는 MVC 컨트롤러다.
+ * 목록 데이터는 외부 API를 직접 호출하지 않고, 동기화된 DB 데이터만 페이지 단위로 조회한다.
+ */
 @Controller
 public class PageMoveController {
 
@@ -29,56 +39,118 @@ public class PageMoveController {
 
 	// 문화 행사 페이지로 이동
 	@GetMapping("/culture")
-	public String moveCulturePage(Model model) {
-
-		model.addAttribute(
-		        "festivalData",
-		        festivalService.getByCategory("행사")
-		);
-		
-	    addLastSyncTime(model);
-	    return "culture";
+	public String moveCulturePage(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "16") int size,
+			@RequestParam(name = "sort", defaultValue = "latest") String sort,
+	        Model model
+	) {
+	    return moveCategoryPage(
+	            "행사",
+	            "culture",
+	            "/culture",
+	            page,
+	            size,
+	            sort,
+	            model
+	    );
 	}
 
-	// 교육 행사 페이지로 이동, 화면에서 상세 페이지 이동이 가능하도록 festivalId를 함께 세팅
 	@GetMapping("/education")
-	public String moveEducationPage(Model model) {
-
-		model.addAttribute(
-		        "festivalData",
-		        festivalService.getByCategory("교육")
-		);
-
-	    addLastSyncTime(model);
-	    return "education";
+	public String moveEducationPage(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "16") int size,
+			@RequestParam(name = "sort", defaultValue = "latest") String sort,
+	        Model model
+	) {
+	    return moveCategoryPage(
+	            "교육",
+	            "education",
+	            "/education",
+	            page,
+	            size,
+	            sort,
+	            model
+	    );
 	}
 
-	// 전시 행사 페이지로 이동, 화면에서 상세 페이지 이동이 가능하도록 festivalId를 함께 세팅
 	@GetMapping("/exhibition")
-	public String moveExhibitionPage(Model model) {
-
-		model.addAttribute(
-		        "festivalData",
-		        festivalService.getByCategory("전시")
-		);
-
-	    addLastSyncTime(model);
-	    return "exhibition";
+	public String moveExhibitionPage(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "16") int size,
+			@RequestParam(name = "sort", defaultValue = "latest") String sort,
+	        Model model
+	) {
+	    return moveCategoryPage(
+	            "전시",
+	            "exhibition",
+	            "/exhibition",
+	            page,
+	            size,
+	            sort,
+	            model
+	    );
 	}
 
-	// 교육 행사 페이지로 이동, 화면에서 상세 페이지 이동이 가능하도록 festivalId를 함께 세팅
 	@GetMapping("/performance")
-	public String movePerformancePage(Model model) {
+	public String movePerformancePage(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "16") int size,
+			@RequestParam(name = "sort", defaultValue = "latest") String sort,
+	        Model model
+	) {
+	    return moveCategoryPage(
+	            "공연",
+	            "performance",
+	            "/performance",
+	            page,
+	            size,
+	            sort,
+	            model
+	    );
+	}
+	
+	/**
+	 * 종료일이 지난 행사를 카테고리와 페이지 크기 기준으로 조회한다.
+	 * 종료 행사도 상세 조회는 가능하지만 새 리뷰 작성은 별도 상세 화면에서 제한한다.
+	 */
+	@GetMapping("/ended")
+	public String moveEndedPage(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "16") int size,
+	        @RequestParam(name = "category", defaultValue = "all") String category,
+	        Model model
+	) {
+	    int safeSize = normalizeSize(size);
+	    int safePage = Math.max(page, 0);
+	    String safeCategory = normalizeEndedCategory(category);
 
-		model.addAttribute(
-		        "festivalData",
-		        festivalService.getByCategory("공연")
-		);
+	    Page<FestivalEntity> festivalPage =
+	            festivalService.getEndedFestivals(
+	                    safeCategory,
+	                    PageRequest.of(
+	                            safePage,
+	                            safeSize,
+	                            Sort.by(Sort.Direction.DESC, "endDe")
+	                    )
+	            );
+
+	    model.addAttribute("festivalData", festivalPage.getContent());
+	    model.addAttribute("festivalPage", festivalPage);
+	    model.addAttribute("size", safeSize);
+	    model.addAttribute("selectedCategory", safeCategory);
+	    model.addAttribute("basePath", "/ended");
+	    model.addAttribute(
+	            "endedFestivalCount",
+	            festivalPage.getTotalElements()
+	    );
 
 	    addLastSyncTime(model);
-	    return "performance";
+
+	    return "ended";
 	}
-	// 외부 API에서 받은 행사 데이터에는 내부 DB id가 없으므로,
+	
+	// API에서 받은 행사 데이터에는 내부 DB id가 없으므로,
 	// 각 Row에 festivalId를 생성/조회해 화면 이동과 리뷰/즐겨찾기 기능에서 사용할 수 있게 한다
 	private void attachFestivalIds(FestivalResponse festivalResponse) {
 		if (festivalResponse == null || festivalResponse.getRow() == null) {
@@ -104,6 +176,7 @@ public class PageMoveController {
 	}
 	
 	
+	// 목록 화면 공통 영역에 마지막 정상 동기화 시각을 전달한다. 
 	private void addLastSyncTime(Model model) {
 	    syncStatusRepository
 	            .findById(1L)
@@ -113,5 +186,65 @@ public class PageMoveController {
 	                            status.getLastSuccessTime()
 	                    )
 	            );
+	}
+	
+	/**
+	 * 네개의 카테고리 목록 화면에서 공통으로 사용하는 DB 페이징 처리
+	 * URL로 전달된 크기·정렬 값은 허용 목록으로 정규화해 예상하지 못한 값이 쿼리에 전달되지 않게 한다.
+	 */
+	private String moveCategoryPage(
+	        String category,
+	        String viewName,
+	        String basePath,
+	        int page,
+	        int size,
+	        String sort,
+	        Model model
+	) {
+	    int safeSize = normalizeSize(size);
+	    int safePage = Math.max(page, 0);
+	    String safeSort = normalizeSort(sort);
+
+	    Sort sortOption;
+
+	    if ("deadline".equals(safeSort)) {
+	        sortOption = Sort.by(Sort.Direction.ASC, "endDe");
+	    } else {
+	        sortOption = Sort.by(Sort.Direction.DESC, "beginDe");
+	    }
+
+	    Page<FestivalEntity> festivalPage =
+	            festivalService.getByCategory(
+	                    category,
+	                    PageRequest.of(safePage, safeSize, sortOption)
+	            );
+
+	    model.addAttribute("festivalData", festivalPage.getContent());
+	    model.addAttribute("festivalPage", festivalPage);
+	    model.addAttribute("size", safeSize);
+	    model.addAttribute("sort", safeSort);
+	    model.addAttribute("basePath", basePath);
+
+	    addLastSyncTime(model);
+
+	    return viewName;
+	}
+
+	// 카드가 4열로 표시되는 화면 구조에 맞춰 16개 또는 32개만 허용한다.
+	private int normalizeSize(int size) {
+	    return size == 32 ? 32 : 16;
+	}
+
+	// 지원하지 않는 정렬 값은 기본 최신순으로 되돌린다.
+	private String normalizeSort(String sort) {
+	    return "deadline".equals(sort) ? "deadline" : "latest";
+	}
+
+	// 종료 행사 보관함에서 허용하는 카테고리만 통과시키고 나머지는 전체 조회로 처리한다.
+	private String normalizeEndedCategory(String category) {
+	    return switch (category) {
+	        case "행사", "전시", "공연", "교육" -> category;
+	        default -> "all";
+	    };
 	}
 }

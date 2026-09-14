@@ -34,6 +34,8 @@ public class ReviewService {
 		FestivalEntity festival = festivalRepository.findById(festivalId)
 				.orElseThrow(() -> new IllegalArgumentException("festival not found: " + festivalId));
 
+		FestivalWriteGuard.check(festival);
+		
 		Review review = new Review();
 		review.setFestivalId(festivalId);
 		review.setFestivalTitle(festival.getTitle());
@@ -63,6 +65,12 @@ public class ReviewService {
 		if (!review.getUsername().equals(currentUsername)) {
 			throw new AccessDeniedException("not review owner");
 		}
+		
+		FestivalEntity festival = festivalRepository.findById(festivalId)
+		        .orElseThrow(() -> new IllegalArgumentException(
+		                "festival not found: " + festivalId));
+
+		FestivalWriteGuard.check(festival);
 
 		review.setContent(newContent);
 		reviewRepository.save(review);
@@ -82,6 +90,11 @@ public class ReviewService {
 			throw new AccessDeniedException("not review owner");
 		}
 
+		FestivalEntity festival = festivalRepository.findById(festivalId)
+		        .orElseThrow(() -> new IllegalArgumentException(
+		                "festival not found: " + festivalId));
+
+		FestivalWriteGuard.check(festival);
 		reviewRepository.delete(review);
 	}
 }

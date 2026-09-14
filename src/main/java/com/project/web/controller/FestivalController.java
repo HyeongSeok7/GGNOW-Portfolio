@@ -2,10 +2,9 @@ package com.project.web.controller;
 
 import com.project.web.model.FavoriteEvent;
 import com.project.web.model.FestivalEntity;
-import com.project.web.model.FestivalResponse;
 import com.project.web.repository.FavoriteEventRepository;
 import com.project.web.repository.FestivalRepository;
-import com.project.web.service.FestivalIdentityService;
+
 import com.project.web.service.FestivalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,6 +21,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.project.web.service.FestivalWriteGuard;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 //행사 상세 조회와 즐겨찾기 API를 담당하는 컨트롤러
 //외부 API 데이터와 내부 DB의 festivalId를 연결해 상세 페이지, 즐겨찾기 기능에서 사용
 @Controller
@@ -30,17 +35,17 @@ public class FestivalController {
 	private static final Logger log = LoggerFactory.getLogger(FestivalController.class);
 
 	private final FavoriteEventRepository favoriteEventRepository;
-	private final FestivalIdentityService festivalIdentityService;
 	private final FestivalService festivalService;
 	private final FestivalRepository festivalRepository;
 
-	public FestivalController(FavoriteEventRepository favoriteEventRepository,
-			FestivalIdentityService festivalIdentityService, FestivalService festivalService,
-			FestivalRepository festivalRepository) {
-		this.favoriteEventRepository = favoriteEventRepository;
-		this.festivalIdentityService = festivalIdentityService;
-		this.festivalService = festivalService;
-		this.festivalRepository = festivalRepository;
+	public FestivalController(
+	        FavoriteEventRepository favoriteEventRepository,
+	        FestivalService festivalService,
+	        FestivalRepository festivalRepository
+	){
+	    this.favoriteEventRepository = favoriteEventRepository;
+	    this.festivalService = festivalService;
+	    this.festivalRepository = festivalRepository;
 	}
 
 	@GetMapping("/main")
@@ -52,26 +57,29 @@ public class FestivalController {
 	// 제목은 특수문자/중복 문제가 있을 수 있으므로,
 	// 실제 상세 페이지는 내부 festivalId 기반 URL로 리다이렉트
 	@GetMapping("/festival/{title:.+}")
-	public String festivalDetail(@PathVariable("title") String title) {
-		try {
-			// URL 인코딩된 제목을 복원한 뒤 검색/비교가 가능하도록 정규화한다
-			String decodedTitle = URLDecoder.decode(title, StandardCharsets.UTF_8.name());
-			String normalizedTitle = festivalService.normalize(decodedTitle);
+	public String festivalDetail(
+	        @PathVariable("title") String title
+	) {
+	    try {
+	        String decodedTitle = URLDecoder.decode(
+	                title,
+	                StandardCharsets.UTF_8.name()
+	        );
 
-			FestivalResponse.Row festival = festivalService.getFestivalByNormalizedTitle(normalizedTitle);
+	        String normalizedTitle =
+	                festivalService.normalize(decodedTitle);
 
-			// 외부 API에는 안정적인 내부 PK가 없기 때문에,
-			// 행사 정보를 조합한 identityKey를 기준으로 DB의 festivalId를 생성하거나 조회
-			String identityKey = festivalService.createFestivalIdentityKey(festival);
+	        FestivalEntity festival =
+	                festivalService.getActiveFestivalByNormalizedTitle(
+	                        normalizedTitle
+	                );
 
-			Long festivalId = festivalIdentityService.getOrCreateFestivalId(identityKey,
-					festivalService.normalize(festival.getTitle()), festival.getTitle());
+	        return "redirect:/festival/id/" + festival.getId();
 
-			return "redirect:/festival/id/" + festivalId;
-		} catch (Exception e) {
-			log.error("Festival detail redirect failed. title={}", title, e);
-			return "error";
-		}
+	    } catch (Exception e) {
+	        log.error("행사 상세 페이지 이동 실패. title={}", title, e);
+	        return "error";
+	    }
 	}
 
 	@GetMapping("/festival/id/{festivalId}")
@@ -82,8 +90,21 @@ public class FestivalController {
 
 	    try {
 
-	        FestivalEntity entity =
-	                festivalRepository.findById(festivalId)
+	    	String today = LocalDate.now(
+	    	        ZoneId.of("Asia/Seoul")
+	    	).toString();
+
+	    	// 일반 상세 주소로 들어와도 종료 행사라면 보관함 상세로 이동
+	    	if (festivalRepository
+	    	        .findEndedFestivalById(festivalId, today)
+	    	        .isPresent()) {
+
+	    	    return "redirect:/ended/festival/" + festivalId;
+	    	}
+	    	
+	    	FestivalEntity entity =
+	    	        festivalRepository
+	    	                .findByIdAndActiveTrue(festivalId)
 	                        .orElseThrow(
 	                                () -> new IllegalArgumentException(
 	                                        "Festival not found id=" + festivalId));
@@ -105,36 +126,111 @@ public class FestivalController {
 	        return "error";
 	    }
 	}
+	
+	// 종료 행사 보관함 전용 상세 페이지
+	// 종료일이 지난 행사만 열 수 있고, 즐겨찾기/리뷰는 제공하지 않는다.
+	@GetMapping("/ended/festival/{festivalId}")
+	public String endedFestivalDetailById(
+	        @PathVariable("festivalId") Long festivalId,
+	        Model model) {
+
+	    try {
+	        FestivalEntity entity =
+	                festivalService.getEndedFestivalById(festivalId);
+
+	        model.addAttribute("festival", entity);
+
+	        return "endedFestivalDetail";
+
+	    } catch (Exception e) {
+	        log.error("종료 행사 상세 페이지 이동 실패. festivalId={}", festivalId, e);
+	        return "error";
+	    }
+	}
+	
 
 	// 로그인한 사용자가 특정 행사를 즐겨찾기에 추가
 	// 중복 추가를 막기 위해 username + eventId 조합을 확인
 	@PostMapping("/addFavoriteEvent")
 	@ResponseBody
-	public ResponseEntity<?> addFavoriteEvent(@RequestBody Map<String, String> payload, Principal principal) {
-		if (principal == null) {
-			return ResponseEntity.status(401).body("로그인이 필요합니다.");
-		}
+	public ResponseEntity<?> addFavoriteEvent(
+	        @RequestBody Map<String, String> payload,
+	        Principal principal) {
 
-		String username = principal.getName();
-		String eventId = payload.get("event_id");
+	    if (principal == null) {
+	        return ResponseEntity.status(401)
+	                .body("로그인이 필요합니다.");
+	    }
 
-		if (eventId == null || eventId.trim().isEmpty()) {
-			return ResponseEntity.badRequest().body("event_id가 필요합니다.");
-		}
+	    String rawEventId = payload.get("event_id");
 
-		eventId = eventId.trim();
+	    if (rawEventId == null || rawEventId.isBlank()) {
+	        return ResponseEntity.badRequest()
+	                .body("행사 ID가 필요합니다.");
+	    }
 
-		if (favoriteEventRepository.existsByUsernameAndEventId(username, eventId)) {
-			return ResponseEntity.ok("이미 즐겨찾기입니다.");
-		}
+	    Long festivalId;
 
-		try {
-			favoriteEventRepository.saveAndFlush(new FavoriteEvent(username, eventId));
-			return ResponseEntity.ok("즐겨찾기에 추가되었습니다.");
-			// 동시에 같은 즐겨찾기 요청이 들어와도 DB unique 제약조건으로 중복 저장을 방지
-		} catch (org.springframework.dao.DataIntegrityViolationException e) {
-			return ResponseEntity.ok("이미 즐겨찾기입니다.");
-		}
+	    try {
+	        festivalId = Long.valueOf(rawEventId.trim());
+	    } catch (NumberFormatException e) {
+	        return ResponseEntity.badRequest()
+	                .body("행사 ID는 올바른 숫자여야 합니다.");
+	    }
+
+	    if (festivalId <= 0) {
+	        return ResponseEntity.badRequest()
+	                .body("행사 ID는 양수여야 합니다.");
+	    }
+
+	    FestivalEntity festival = festivalRepository
+	            .findById(festivalId)
+	            .orElse(null);
+
+	    if (festival == null) {
+	        return ResponseEntity.status(404)
+	                .body("행사를 찾을 수 없습니다.");
+	    }
+
+	    try {
+	        FestivalWriteGuard.check(festival);
+	    } catch (FestivalWriteGuard.WriteNotAllowedException e) {
+	        return ResponseEntity.status(409)
+	                .body(e.getMessage());
+	    }
+
+	    String username = principal.getName();
+	    String eventId = festivalId.toString();
+
+	    if (favoriteEventRepository
+	            .existsByUsernameAndEventId(username, eventId)) {
+	        return ResponseEntity.ok("이미 즐겨찾기입니다.");
+	    }
+
+	    try {
+	        favoriteEventRepository.saveAndFlush(
+	                new FavoriteEvent(username, eventId)
+	        );
+
+	        return ResponseEntity.ok("즐겨찾기에 추가되었습니다.");
+
+	    } catch (DataIntegrityViolationException e) {
+
+	        // 동시에 추가된 경우인지 실제로 확인
+	        if (favoriteEventRepository
+	                .existsByUsernameAndEventId(username, eventId)) {
+	            return ResponseEntity.ok("이미 즐겨찾기입니다.");
+	        }
+
+	        log.error(
+	                "즐겨찾기 저장 실패. festivalId={}",
+	                festivalId,
+	                e
+	        );
+
+	        return ResponseEntity.status(500)
+	                .body("즐겨찾기 저장 중 오류가 발생했습니다.");
+	    }
 	}
 
 	// 현재 로그인한 사용자의 즐겨찾기 행사 ID 목록을 반환

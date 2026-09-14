@@ -29,7 +29,7 @@ public class SecurityConfig {
 																										// 엔드포인트
 						"/assets/**", "/images/**",
 
-						"/performance", "/exhibition", "/culture", "/education",
+						"/performance", "/exhibition", "/culture", "/education", "/ended", "/ended/**",
 
 						"/festival/**", "/search", "/customer", "/check-login")
 				.permitAll() // 위에 나열된 URL은 인증 없이 접근 가능

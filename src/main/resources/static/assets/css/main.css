@@ -2483,3 +2483,129 @@ a {
     filter: blur(0);
 }
 
+.ended-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 36px 0 20px;
+}
+
+.ended-pagination button {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #52617a;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.ended-pagination button:hover:not(:disabled) {
+    border-color: #6b63ff;
+    color: #6b63ff;
+    background: #f4f3ff;
+}
+
+.ended-pagination button.is-active {
+    border-color: #5b6df8;
+    background: linear-gradient(135deg, #5b6df8, #7a5af8);
+    color: #ffffff;
+}
+
+.ended-pagination button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.festival-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 36px 0 20px;
+}
+
+.festival-pagination button {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #52617a;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.festival-pagination button:hover:not(:disabled) {
+    border-color: #6b63ff;
+    background: #f4f3ff;
+    color: #6b63ff;
+}
+
+.festival-pagination button.is-active {
+    border-color: #5b6df8;
+    background: linear-gradient(135deg, #5b6df8, #7a5af8);
+    color: #ffffff;
+}
+
+.festival-pagination button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.festival-pagination a,
+.festival-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #52617a;
+
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.festival-pagination a:hover {
+    border-color: #6b63ff;
+    background: #f4f3ff;
+    color: #6b63ff;
+}
+
+.festival-pagination a.is-active {
+    border-color: #5b6df8;
+    background: linear-gradient(135deg, #5b6df8, #7a5af8);
+    color: #ffffff;
+}
+
+.festival-pagination span.is-disabled {
+    opacity: 0.45;
+    cursor: default;
+}
