@@ -7,7 +7,7 @@
 <meta name="_csrf_header" th:content="${_csrf.headerName}">
 <link rel="stylesheet" href="/assets/css/base.css">
 <link rel="stylesheet" href="/assets/css/main.css?v=3.0">
-<link rel="stylesheet" href="/assets/css/mypage.css">
+<link rel="stylesheet" href="/assets/css/mypage.css?v=1.1">
 <title>작성 리뷰 조회</title>
 </head>
 <body class="event-page">
@@ -71,10 +71,52 @@
 					<span class="section-count" th:text="${#lists.size(reviews)} + '개'">0개</span>
 				</div>
 
+				<nav class="history-category-tabs" aria-label="기록 종류 선택">
+
+				    <a th:href="@{${historyFilterPath}(category='all')}"
+				       th:classappend="${selectedCategory == 'all'} ? 'is-active' : ''"
+				       th:attr="aria-current=${selectedCategory == 'all' ? 'page' : null}">
+				        전체
+				    </a>
+				
+				    <a th:href="@{${historyFilterPath}(category='행사')}"
+				       th:classappend="${selectedCategory == '행사'} ? 'is-active' : ''"
+				       th:attr="aria-current=${selectedCategory == '행사' ? 'page' : null}">
+				        문화
+				    </a>
+				
+				    <a th:href="@{${historyFilterPath}(category='전시')}"
+				       th:classappend="${selectedCategory == '전시'} ? 'is-active' : ''"
+				       th:attr="aria-current=${selectedCategory == '전시' ? 'page' : null}">
+				        전시
+				    </a>
+				
+				    <a th:href="@{${historyFilterPath}(category='공연')}"
+				       th:classappend="${selectedCategory == '공연'} ? 'is-active' : ''"
+				       th:attr="aria-current=${selectedCategory == '공연' ? 'page' : null}">
+				        공연
+				    </a>
+				
+				    <a th:href="@{${historyFilterPath}(category='교육')}"
+				       th:classappend="${selectedCategory == '교육'} ? 'is-active' : ''"
+				       th:attr="aria-current=${selectedCategory == '교육' ? 'page' : null}">
+				        교육
+				    </a>
+				
+				</nav>
+
 				<div th:if="${#lists.isEmpty(reviews)}" class="empty-state">
 					<div class="empty-icon">✍</div>
-					<p class="empty-title">아직 작성한 리뷰가 없어요</p>
-					<p class="empty-desc">행사 상세 페이지에서 첫 리뷰를 남겨보세요.</p>
+					<p class="empty-title"
+					   th:text="${selectedCategory == 'all'
+					       ? '아직 작성한 리뷰가 없어요'
+					       : '이 종류에 작성한 리뷰가 없어요'}">
+					    작성한 리뷰가 없습니다.
+					</p>
+					
+					<p class="empty-desc">
+					    다른 종류를 선택하거나 전체 기록을 확인해보세요.
+					</p>
 					<a href="/main" class="empty-link">행사 둘러보기</a>
 				</div>
 

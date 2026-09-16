@@ -29,16 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                //  화면에서 카드 제거
-                const card = btn.closest(".event-card");
-                if (card) card.remove();
-
-                //  모두 제거되면 빈 상태 메시지 보여주기
-                const list = document.querySelector(".favorites-section");
-                const remaining = document.querySelectorAll(".event-card").length;
-                if (list && remaining === 0) {
-                    list.insertAdjacentHTML("beforeend", "<p>즐겨찾기한 행사가 없습니다.</p>");
-                }
+                // 현재 category를 유지하면서 개수와 빈 화면 안내를 함께 갱신한다.
+				window.location.reload();
 
             } catch (err) {
                 console.error(err);

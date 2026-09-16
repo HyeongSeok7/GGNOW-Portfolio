@@ -593,3 +593,41 @@ body {
         min-height: 48px;
     }
 }
+
+/* 즐겨찾기 / 작성 리뷰 공통 종류 선택 */
+.history-category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+}
+
+.history-category-tabs a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 16px;
+    border: 1px solid #dce3f0;
+    border-radius: 999px;
+    background: #fff;
+    color: #52617a;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.history-category-tabs a:hover {
+    background: #f3f1ff;
+    border-color: #7564f8;
+}
+
+.history-category-tabs a.is-active {
+    background: linear-gradient(135deg, #5b6df8, #7a5af8);
+    border-color: transparent;
+    color: #fff;
+}
+
+.history-category-tabs a:focus-visible {
+    outline: 3px solid #a7a0ff;
+    outline-offset: 3px;
+}

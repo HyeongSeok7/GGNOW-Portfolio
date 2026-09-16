@@ -34,6 +34,12 @@ public interface FestivalRepository extends JpaRepository<FestivalEntity, Long> 
 		List<FestivalEntity> findByIdInOrderByBeginDeDescIdDesc(Collection<Long> ids);
 		
 		
+		List<FestivalEntity> findByIdInAndCategoryNmOrderByBeginDeDescIdDesc(
+		        Collection<Long> ids,
+		        String categoryNm
+		);
+		
+		
 	    @Modifying
 	    @Query(value = """
 	            INSERT IGNORE INTO festival (identity_key, normalized_title, title)

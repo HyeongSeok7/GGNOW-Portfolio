@@ -20,7 +20,7 @@ import com.project.web.model.FestivalEntity;
 import com.project.web.repository.FestivalRepository;
 
 import java.util.Objects;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import java.security.Principal;
 import java.util.List;
 
@@ -51,52 +51,99 @@ public class MyPageController {
 
 	// 로그인한 사용자의 기본 정보와 즐겨찾기 행사 목록을 조회해 마이페이지에 전달
 	@GetMapping("/mypage")
-	public String showMyPage(Model model, Principal principal) {
+	public String showMyPage(
+	        @RequestParam(name = "category", defaultValue = "all") String category,
+	        Model model,
+	        Principal principal
+	) {
+	    String username = principal.getName();
+	    String selectedCategory = normalizeHistoryCategory(category);
 
-		// 현재 로그인한 사용자의 이름 가져오기
-		String username = principal.getName();
-		User user = userService.getUserByUsername(username); // 사용자 이름을 기반으로 사용자 정보를 가져온다
-		model.addAttribute("user", user); // 사용자 정보를 모델에 추가하여 뷰로 전달
+	    User user = userService.getUserByUsername(username);
+	    model.addAttribute("user", user);
 
-		// 즐겨찾기 이벤트의 ID 목록 추출
-		List<Long> favoriteFestivalIds =
-		        favoriteEventRepository.findAllByUsername(username)
-		                .stream()
-		                .map(FavoriteEvent::getEventId)
-		                .map(this::parseFestivalId)
-		                .filter(Objects::nonNull)
-		                .toList();
+	    // 로그인한 사용자 본인의 즐겨찾기 ID만 가져온다.
+	    List<Long> favoriteFestivalIds =
+	            favoriteEventRepository.findAllByUsername(username)
+	                    .stream()
+	                    .map(FavoriteEvent::getEventId)
+	                    .map(this::parseFestivalId)
+	                    .filter(Objects::nonNull)
+	                    .toList();
 
-		// 즐겨찾기는 개인 기록이므로 종료·비활성 행사도 함께 조회한다.
-		List<FestivalEntity> favoriteEventDetails =
-		        favoriteFestivalIds.isEmpty()
-		                ? List.of()
-		                : festivalRepository
-		                        .findByIdInOrderByBeginDeDescIdDesc(
-		                                favoriteFestivalIds
-		                        );
+	    List<FestivalEntity> favoriteEventDetails;
 
-		// 즐겨찾기 이벤트 상세 정보를 모델에 추가
-		model.addAttribute("favoriteEvents", favoriteEventDetails);
-		
-		// 화면에서 종료 여부를 한국 날짜 기준으로 표시한다.
-		model.addAttribute(
-		        "today",
-		        LocalDate.now(ZoneId.of("Asia/Seoul")).toString()
-		);
+	    if (favoriteFestivalIds.isEmpty()) {
+	        favoriteEventDetails = List.of();
 
-		// mypage 뷰 이름 반환
-		return "mypage";
+	    } else if ("all".equals(selectedCategory)) {
+	        // 전체: 종료·비활성 행사까지 포함
+	        favoriteEventDetails = festivalRepository
+	                .findByIdInOrderByBeginDeDescIdDesc(
+	                        favoriteFestivalIds
+	                );
+
+	    } else {
+	        // 선택한 종류: 종료·비활성 행사까지 포함
+	        favoriteEventDetails = festivalRepository
+	                .findByIdInAndCategoryNmOrderByBeginDeDescIdDesc(
+	                        favoriteFestivalIds,
+	                        selectedCategory
+	                );
+	    }
+
+	    model.addAttribute("favoriteEvents", favoriteEventDetails);
+	    model.addAttribute("selectedCategory", selectedCategory);
+	    model.addAttribute("historyFilterPath", "/mypage");
+
+	    // 기존 종료 상태 표시 유지
+	    model.addAttribute(
+	            "today",
+	            LocalDate.now(ZoneId.of("Asia/Seoul")).toString()
+	    );
+
+	    return "mypage";
 	}
 
 	// 현재 로그인한 사용자가 작성한 리뷰를 최신순으로 조회해 내 리뷰 페이지에 전달
 	@GetMapping("/my-reviews")
-	public String myReviews(Model model, Principal principal) {
-		String username = principal.getName();
-		model.addAttribute("reviews", reviewService.getReviewsByUsername(username));
-		return "my-reviews";
+	public String myReviews(
+	        @RequestParam(name = "category", defaultValue = "all") String category,
+	        Model model,
+	        Principal principal
+	) {
+	    String username = principal.getName();
+	    String selectedCategory = normalizeHistoryCategory(category);
+
+	    model.addAttribute(
+	            "reviews",
+	            reviewService.getReviewsByUsername(
+	                    username,
+	                    selectedCategory
+	            )
+	    );
+
+	    model.addAttribute("selectedCategory", selectedCategory);
+	    model.addAttribute("historyFilterPath", "/my-reviews");
+
+	    return "my-reviews";
 	}
 
+	// 지원하지 않는 값은 전체 조회로 처리한다.
+	private String normalizeHistoryCategory(String category) {
+	    if (category == null) {
+	        return "all";
+	    }
+
+	    String value = category.trim();
+
+	    return switch (value) {
+	        case "문화", "행사" -> "행사";
+	        case "전시", "공연", "교육" -> value;
+	        default -> "all";
+	    };
+	}
+	
 	// 비밀번호 변경 폼을 보여주기 위해 빈 DTO 객체를 모델에 담아 전달
 	@GetMapping("/change-password")
 	public String showChangePasswordPage(Model model) {

@@ -27,6 +27,21 @@ public class ReviewService {
 	public List<Review> getReviewsByFestivalId(Long festivalId) {
 		return reviewRepository.findByFestivalIdOrderByCreatedAtDesc(festivalId);
 	}
+	
+	// 전체 조회는 기존 방식을 유지하고, 종류 선택 시에만 필터링한다.
+	public List<Review> getReviewsByUsername(
+	        String username,
+	        String category
+	) {
+	    if ("all".equals(category)) {
+	        return getReviewsByUsername(username);
+	    }
+
+	    return reviewRepository.findByUsernameAndFestivalCategory(
+	            username,
+	            category
+	    );
+	}
 
 	// 리뷰 작성 전 festivalId가 실제 내부 행사 테이블에 존재하는지 확인
 	// 리뷰에는 행사 제목을 스냅샷으로 저장해 마이페이지에서 바로 표시할 수 있게 한다
