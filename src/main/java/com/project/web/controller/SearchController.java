@@ -1,36 +1,40 @@
 package com.project.web.controller;
 
-import com.project.web.model.FestivalResponse;
-import com.project.web.service.FestivalIdentityService;
 import com.project.web.service.FestivalService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
-//행사 검색 결과 페이지를 담당하는 컨트롤러
-//키워드로 검색한 행사 목록에 내부 festivalId를 붙여 상세 페이지 이동이 가능하게 한다
 @Controller
 public class SearchController {
 
-	private final FestivalService festivalService;
-	private final FestivalIdentityService festivalIdentityService;
+    private final FestivalService festivalService;
 
-	public SearchController(FestivalService festivalService, FestivalIdentityService festivalIdentityService) {
-		this.festivalService = festivalService;
-		this.festivalIdentityService = festivalIdentityService;
-	}
+    public SearchController(FestivalService festivalService) {
+        this.festivalService = festivalService;
+    }
 
-	// 사용자가 입력한 키워드로 행사 제목, 기관명, 주소를 검색 (DB에서 검색)
-	// 검색 결과마다 festivalId를 세팅해 상세 페이지 URL에서 사용할 수 있게 한다
-	@GetMapping("/search")
-	public String searchFestivals(@RequestParam("keyword") String keyword, Model model) {
-		List<FestivalResponse.Row> filterFestivals = festivalService.searchFestivals(keyword);
+    // 같은 검색어로 진행 중·예정 행사와 종료 행사를 각각 검색한다.
+    @GetMapping("/search")
+    public String searchFestivals(
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            Model model
+    ) {
+        String searchKeyword = keyword.trim();
 
-		model.addAttribute("festivalData", filterFestivals);
-		
-		return "searchlist";
-	}
+        FestivalService.SearchResult result =
+                festivalService.searchFestivals(searchKeyword);
+
+        // 검색창에 입력한 검색어를 유지한다.
+        model.addAttribute("keyword", searchKeyword);
+
+        // 위쪽에 표시할 진행 중·예정 행사
+        model.addAttribute("festivalData", result.activeFestivals());
+
+        // 아래쪽에 표시할 종료 행사
+        model.addAttribute("endedFestivalData", result.endedFestivals());
+
+        return "searchlist";
+    }
 }

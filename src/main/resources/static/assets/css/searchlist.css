@@ -162,3 +162,55 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+/* main.css의 공통 카드 정렬보다 우선 적용 */
+.event-tools-card.result-summary-card {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+/* 진행 행사 영역과 종료 행사 영역 사이 간격 */
+.ended-search-section {
+    margin-top: 28px;
+}
+
+/* 종료 행사 카드 */
+.ended-search-card {
+    border-color: #dbe2ee;
+    background: #fcfdff;
+}
+
+/* 종료 표시 */
+.ended-search-badge {
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #e9edf5;
+    color: #526079;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* 종료 행사 상세 페이지 버튼 */
+.result-detail-btn.ended-search-btn {
+    background: #53627c;
+    box-shadow: none;
+}
+
+/* 검색 결과가 없을 때 안내 */
+.search-empty-message {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px;
+    border: 1px dashed #d6deed;
+    border-radius: 18px;
+    background: #f8faff;
+    color: #64748b;
+    text-align: center;
+}
+
+.search-empty-message p {
+    margin: 6px 0;
+}

@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.springframework.transaction.annotation.Transactional;
 /**
  * 외부 행사 API와 내부 행사 DB 사이의 변환·조회 규칙을 담당하는 핵심 서비스
  * API 호출은 동기화 작업에서만 수행하고, 화면 목록·검색은 저장된 DB를 조회한다.
@@ -202,21 +203,40 @@ public class FestivalService {
 	            : LocalDate.parse(value.trim()).toString();
 	}
 
-	// 검색어와 행사 데이터를 정규화한 뒤 제목, 기관명, 주소를 기준으로 검색
-	// 공백/특수문자 차이로 검색이 실패하지 않도록 normalize 결과를 비교
-	public List<FestivalResponse.Row> searchFestivals(String keyword) {
+	// 한 번의 검색 결과를 두 목록으로 묶어서 전달한다.
+	public record SearchResult(
+	        List<FestivalResponse.Row> activeFestivals,
+	        List<FestivalResponse.Row> endedFestivals
+	) {}
 
-		String normalizedKeyword = normalize(keyword);
-		
-		if (normalizedKeyword.isBlank()) {
-			return List.of();
-		}
-		
-		return festivalRepository
-				.searchActiveFestivals(normalizedKeyword)
-				.stream()
-				.map(this::toRow)
-				.collect(Collectors.toList());
+	// 외부 API를 호출하지 않고 DB에 저장된 행사만 검색한다.
+	@Transactional(readOnly = true)
+	public SearchResult searchFestivals(String keyword) {
+
+	    String normalizedKeyword = normalize(keyword);
+
+	    // 검색어가 없으면 전체 데이터를 조회하지 않는다.
+	    if (normalizedKeyword.isBlank()) {
+	        return new SearchResult(List.of(), List.of());
+	    }
+
+	    // 두 목록이 동일한 한국 날짜를 기준으로 분리되도록
+	    // 오늘 날짜는 한 번만 계산한다.
+	    String today = todayInKorea();
+
+	    List<FestivalResponse.Row> activeFestivals = festivalRepository
+	            .searchActiveFestivals(normalizedKeyword, today)
+	            .stream()
+	            .map(this::toRow)
+	            .collect(Collectors.toList());
+
+	    List<FestivalResponse.Row> endedFestivals = festivalRepository
+	            .searchEndedFestivals(normalizedKeyword, today)
+	            .stream()
+	            .map(this::toRow)
+	            .collect(Collectors.toList());
+
+	    return new SearchResult(activeFestivals, endedFestivals);
 	}
 
 	public FestivalEntity getActiveFestivalByNormalizedTitle(

@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="/assets/css/base.css">
 <link rel="stylesheet" href="/assets/css/main.css?v=4.1">
 <link rel="stylesheet" href="/assets/css/detail.css?v=2.0">
-<title th:text="${festival.title} + ' | 종료 행사 기록'">종료 행사 기록</title>
+<title th:text="${festival.title} + ' | 행사 기록'">행사 기록</title>
 </head>
 
 <body class="detail-page">
@@ -59,12 +59,20 @@
 
         <section class="detail-hero">
             <div class="detail-hero__text">
-                <p class="detail-badge">ENDED FESTIVAL ARCHIVE</p>
+                <p class="detail-badge"
+				   th:text="${inactiveArchive == true
+				       ? 'INACTIVE FESTIVAL ARCHIVE'
+				       : 'ENDED FESTIVAL ARCHIVE'}">
+				    FESTIVAL ARCHIVE
+				</p>
                 <h1 th:text="${festival.title}">행사 제목</h1>
 
-                <p class="detail-hero__desc">
-                    종료된 행사 기록입니다. 일정과 안내 정보는 API에서 저장된 당시 정보를 기준으로 표시됩니다.
-                </p>
+                <p class="detail-hero__desc"
+				   th:text="${inactiveArchive == true
+				       ? '현재 일반 목록에서 제공되지 않는 행사입니다. 취소 여부는 확인되지 않았으며, 마지막으로 저장된 정보와 기존 리뷰를 표시합니다.'
+				       : '종료된 행사 기록입니다. 일정과 안내 정보는 마지막으로 저장된 정보를 기준으로 표시됩니다.'}">
+				    저장된 행사 기록입니다.
+				</p>
 
                 <div class="detail-hero__actions">
                     <a href="/ended" class="detail-action-btn primary">
@@ -78,11 +86,20 @@
             </div>
 
             <div class="detail-hero__visual">
-                <div class="detail-hero__blob"></div>
-
-                <img th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
-                     alt="종료 행사 이미지">
-            </div>
+			    <div class="detail-hero__blob"></div>
+			
+			    <button type="button"
+			            class="detail-image-trigger"
+			            id="detailImageTrigger"
+			            aria-label="행사 이미지 크게 보기"
+			            aria-haspopup="dialog"
+			            aria-controls="imageLightbox">
+			
+			        <img id="detailHeroImage"
+			             th:src="${festival.imageUrl != null && !#strings.isEmpty(festival.imageUrl) ? festival.imageUrl : '/images/banner.png'}"
+			             alt="행사 기록 이미지">
+			    </button>
+			</div>
         </section>
 
         <section class="detail-page-stack">
@@ -206,16 +223,38 @@
 		            <h2>작성된 리뷰</h2>
 		        </div>
 		    </div>
-		
-		    <p class="detail-hero__desc">
-		        종료된 행사에 작성된 기존 리뷰입니다. 이 페이지에서는 새로운 리뷰 작성과 수정·삭제가 불가능합니다.
-		    </p>
-		
+		    이 행사에 작성된 기존 리뷰입니다. 이 페이지에서는 새로운 리뷰 작성과 수정·삭제가 불가능합니다.
 		    <div id="reviewList" class="review-list"></div>
 		</section>
 
     </main>
+	    <!-- 행사 이미지 확대-->
+	<div class="image-lightbox"
+	     id="imageLightbox"
+	     aria-hidden="true">
+	
+	    <div class="image-lightbox__backdrop"
+	         id="imageLightboxBackdrop"></div>
+	
+	    <div class="image-lightbox__dialog"
+	         role="dialog"
+	         aria-modal="true"
+	         aria-label="행사 이미지 크게 보기">
+	
+	        <button type="button"
+	                class="image-lightbox__close"
+	                id="imageLightboxClose"
+	                aria-label="이미지 확대 창 닫기">
+	            ×
+	        </button>
+	
+	        <img class="image-lightbox__img"
+	             id="imageLightboxImg"
+	             alt="행사 확대 이미지">
+	    </div>
+	</div>
 	<script src="/assets/js/ended-review.js"></script>
+	<script src="/assets/js/ended-image-lightbox.js?v=1.0"></script>
 	<script src="/assets/js/base.js"></script>
 </body>
 </html>

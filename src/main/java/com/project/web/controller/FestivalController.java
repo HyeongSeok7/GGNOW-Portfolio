@@ -104,13 +104,20 @@ public class FestivalController {
 	    	
 	    	FestivalEntity entity =
 	    	        festivalRepository
-	    	                .findByIdAndActiveTrue(festivalId)
+	    	                .findById(festivalId)
 	                        .orElseThrow(
 	                                () -> new IllegalArgumentException(
 	                                        "Festival not found id=" + festivalId));
 
 	        model.addAttribute("festivalId", festivalId);
 	        model.addAttribute("festival", entity);
+		     // 종료일 전이라도 API에서 사라져 비활성화된 행사는
+		     // 마지막으로 저장된 정보와 기존 리뷰를 읽기 전용으로 제공한다.
+		     if (!entity.isActive()) {
+		         model.addAttribute("inactiveArchive", true);
+		         return "endedFestivalDetail";
+		     }
+		     
 	        model.addAttribute(
 	                "currentUsername",
 	                principal != null ? principal.getName() : "");
@@ -128,7 +135,7 @@ public class FestivalController {
 	}
 	
 	// 종료 행사 보관함 전용 상세 페이지
-	// 종료일이 지난 행사만 열 수 있고, 즐겨찾기/리뷰는 제공하지 않는다.
+	// 종료일이 지난 행사만 열 수 있고, 기존 리뷰를 읽기 전용으로 제공한다.
 	@GetMapping("/ended/festival/{festivalId}")
 	public String endedFestivalDetailById(
 	        @PathVariable("festivalId") Long festivalId,
@@ -139,6 +146,7 @@ public class FestivalController {
 	                festivalService.getEndedFestivalById(festivalId);
 
 	        model.addAttribute("festival", entity);
+	        model.addAttribute("inactiveArchive", false);
 
 	        return "endedFestivalDetail";
 

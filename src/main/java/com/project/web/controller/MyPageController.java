@@ -24,6 +24,9 @@ import java.util.Objects;
 import java.security.Principal;
 import java.util.List;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 //마이페이지 관련 화면을 담당하는 컨트롤러
 //사용자 정보, 즐겨찾기 행사, 내가 작성한 리뷰, 비밀번호 변경 기능을 처리
 @Controller
@@ -64,16 +67,23 @@ public class MyPageController {
 		                .filter(Objects::nonNull)
 		                .toList();
 
+		// 즐겨찾기는 개인 기록이므로 종료·비활성 행사도 함께 조회한다.
 		List<FestivalEntity> favoriteEventDetails =
 		        favoriteFestivalIds.isEmpty()
 		                ? List.of()
 		                : festivalRepository
-		                        .findByIdInAndActiveTrueOrderByBeginDeDesc(
+		                        .findByIdInOrderByBeginDeDescIdDesc(
 		                                favoriteFestivalIds
 		                        );
 
 		// 즐겨찾기 이벤트 상세 정보를 모델에 추가
 		model.addAttribute("favoriteEvents", favoriteEventDetails);
+		
+		// 화면에서 종료 여부를 한국 날짜 기준으로 표시한다.
+		model.addAttribute(
+		        "today",
+		        LocalDate.now(ZoneId.of("Asia/Seoul")).toString()
+		);
 
 		// mypage 뷰 이름 반환
 		return "mypage";

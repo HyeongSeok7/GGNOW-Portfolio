@@ -29,6 +29,11 @@ public interface FestivalRepository extends JpaRepository<FestivalEntity, Long> 
 
 	    List<FestivalEntity> findByIdInAndActiveTrueOrderByBeginDeDesc(Collection<Long> ids);
 	    
+		// 마이페이지에서는 종료·비활성 행사도 사용자 기록으로 조회한다.
+		// 행사 시작일이 같으면 ID 내림차순으로 정렬한다.
+		List<FestivalEntity> findByIdInOrderByBeginDeDescIdDesc(Collection<Long> ids);
+		
+		
 	    @Modifying
 	    @Query(value = """
 	            INSERT IGNORE INTO festival (identity_key, normalized_title, title)
@@ -53,20 +58,48 @@ public interface FestivalRepository extends JpaRepository<FestivalEntity, Long> 
 	    List<FestivalEntity> findByCategoryNmAndActiveTrueOrderByBeginDeDesc(
 	            String categoryNm);
 	    
-	    @Query("""
-	    		SELECT f
-	    		FROM FestivalEntity f
-	    		WHERE f.active = true
-	    		AND (
-	    		f.normalizedTitle LIKE CONCAT('%', :keyword, '%')
-	    		OR LOWER(f.hostInstNm) LIKE LOWER(CONCAT('%', :keyword, '%'))
-	    		OR LOWER(f.address) LIKE LOWER(CONCAT('%', :keyword, '%'))
-	    		)
-	    		ORDER BY f.beginDe DESC
-	    		""")
-	    		List<FestivalEntity> searchActiveFestivals(
-	    		        @Param("keyword") String keyword);
-	    
+		 // 진행 중·예정 행사 검색
+		 // 종료일이 지난 행사는 active=true로 남아 있어도 제외한다.
+		 @Query("""
+		         SELECT f
+		         FROM FestivalEntity f
+		         WHERE f.active = true
+		           AND (
+		               f.endDe IS NULL
+		               OR TRIM(f.endDe) = ''
+		               OR f.endDe >= :today
+		           )
+		           AND (
+		               f.normalizedTitle LIKE CONCAT('%', :keyword, '%')
+		               OR LOWER(f.hostInstNm) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		               OR LOWER(f.address) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		           )
+		         ORDER BY f.beginDe DESC, f.id DESC
+		         """)
+		 List<FestivalEntity> searchActiveFestivals(
+		         @Param("keyword") String keyword,
+		         @Param("today") String today
+		 );
+	
+		 // 종료 행사 검색
+		 // active=false 전체가 아니라, 실제 종료일이 지난 행사만 조회한다.
+		 @Query("""
+		         SELECT f
+		         FROM FestivalEntity f
+		         WHERE f.endDe IS NOT NULL
+		           AND TRIM(f.endDe) <> ''
+		           AND f.endDe < :today
+		           AND (
+		               f.normalizedTitle LIKE CONCAT('%', :keyword, '%')
+		               OR LOWER(f.hostInstNm) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		               OR LOWER(f.address) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		           )
+		         ORDER BY f.endDe DESC, f.id DESC
+		         """)
+		 List<FestivalEntity> searchEndedFestivals(
+		         @Param("keyword") String keyword,
+		         @Param("today") String today
+		 );
 	    @Modifying
 	    @Query("""
 	            UPDATE FestivalEntity f

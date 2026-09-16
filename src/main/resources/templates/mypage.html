@@ -121,7 +121,15 @@
 							th:src="${event.imageUrl != null && !#strings.isEmpty(event.imageUrl) ? event.imageUrl : '/images/banner.png'}"
 							alt="행사 이미지">
 							<div class="event-info">
-								<span class="event-chip">FESTIVAL</span>
+								<span class="event-chip"
+								      th:with="ended=${event.endDe != null
+								          and !#strings.isEmpty(event.endDe.trim())
+								          and event.endDe.trim().compareTo(today) < 0}"
+								      th:text="${ended
+								          ? '종료된 행사'
+								          : (!event.active ? '현재 제공 안 됨' : '진행 중·예정')}">
+								    행사 상태
+								</span>
 								<h3 th:text="${event.title}">행사 제목</h3>
 
 								<p>
