@@ -116,8 +116,8 @@ public class PageMoveController {
 	 */
 	@GetMapping("/ended")
 	public String moveEndedPage(
-			@RequestParam(name = "page", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "16") int size,
+	        @RequestParam(name = "page", defaultValue = "0") int page,
+	        @RequestParam(name = "size", defaultValue = "16") int size,
 	        @RequestParam(name = "category", defaultValue = "all") String category,
 	        Model model
 	) {
@@ -125,15 +125,42 @@ public class PageMoveController {
 	    int safePage = Math.max(page, 0);
 	    String safeCategory = normalizeEndedCategory(category);
 
+	    // 종료일이 같아도 페이지 간 정렬 순서가 일정하도록 ID를 함께 사용한다.
+	    Sort sortOption = Sort.by(
+	            Sort.Direction.DESC,
+	            "endDe",
+	            "id"
+	    );
+
 	    Page<FestivalEntity> festivalPage =
 	            festivalService.getEndedFestivals(
 	                    safeCategory,
-	                    PageRequest.of(
-	                            safePage,
-	                            safeSize,
-	                            Sort.by(Sort.Direction.DESC, "endDe")
-	                    )
+	                    PageRequest.of(safePage, safeSize, sortOption)
 	            );
+
+	    // 존재하지 않는 큰 페이지 번호를 요청하면 마지막 페이지를 조회한다.
+	    int lastPage = Math.max(festivalPage.getTotalPages() - 1, 0);
+
+	    if (safePage > lastPage) {
+	        safePage = lastPage;
+
+	        festivalPage = festivalService.getEndedFestivals(
+	                safeCategory,
+	                PageRequest.of(safePage, safeSize, sortOption)
+	        );
+	    }
+
+	    // 페이지 번호를 10개씩 묶어서 표시한다.
+	    // 내부 번호는 0부터 시작하고, 화면에서는 1을 더해 표시한다.
+	    int pageBlockSize = 10;
+	    int startPage = (safePage / pageBlockSize) * pageBlockSize;
+	    int endPage = Math.min(
+	            startPage + pageBlockSize - 1,
+	            Math.max(festivalPage.getTotalPages() - 1, 0)
+	    );
+
+	    model.addAttribute("startPage", startPage);
+	    model.addAttribute("endPage", endPage);
 
 	    model.addAttribute("festivalData", festivalPage.getContent());
 	    model.addAttribute("festivalPage", festivalPage);
@@ -205,12 +232,21 @@ public class PageMoveController {
 	    int safePage = Math.max(page, 0);
 	    String safeSort = normalizeSort(sort);
 
+	    // 날짜가 같은 행사도 페이지 간 정렬 순서가 일정하도록 ID를 사용한다.
 	    Sort sortOption;
 
 	    if ("deadline".equals(safeSort)) {
-	        sortOption = Sort.by(Sort.Direction.ASC, "endDe");
+	        sortOption = Sort.by(
+	                Sort.Direction.ASC,
+	                "endDe",
+	                "id"
+	        );
 	    } else {
-	        sortOption = Sort.by(Sort.Direction.DESC, "beginDe");
+	        sortOption = Sort.by(
+	                Sort.Direction.DESC,
+	                "beginDe",
+	                "id"
+	        );
 	    }
 
 	    Page<FestivalEntity> festivalPage =
@@ -218,6 +254,29 @@ public class PageMoveController {
 	                    category,
 	                    PageRequest.of(safePage, safeSize, sortOption)
 	            );
+
+	    // 범위를 벗어난 페이지를 요청하면 마지막 유효 페이지를 조회한다.
+	    int lastPage = Math.max(festivalPage.getTotalPages() - 1, 0);
+
+	    if (safePage > lastPage) {
+	        safePage = lastPage;
+
+	        festivalPage = festivalService.getByCategory(
+	                category,
+	                PageRequest.of(safePage, safeSize, sortOption)
+	        );
+	    }
+
+	    // 페이지 번호를 1~10, 11~20처럼 10개씩 표시한다.
+	    int pageBlockSize = 10;
+	    int startPage = (safePage / pageBlockSize) * pageBlockSize;
+	    int endPage = Math.min(
+	            startPage + pageBlockSize - 1,
+	            Math.max(festivalPage.getTotalPages() - 1, 0)
+	    );
+
+	    model.addAttribute("startPage", startPage);
+	    model.addAttribute("endPage", endPage);
 
 	    model.addAttribute("festivalData", festivalPage.getContent());
 	    model.addAttribute("festivalPage", festivalPage);

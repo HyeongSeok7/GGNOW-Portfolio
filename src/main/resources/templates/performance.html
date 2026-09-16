@@ -207,48 +207,83 @@
 					</div>
 				</div>
 				
-				<nav class="festival-pagination"
+				<nav class="festival-pagination ended-pagination-compact"
 				     th:if="${festivalPage.totalPages > 1}"
 				     aria-label="행사 페이지 이동">
 				
+				    <!-- 첫 페이지 -->
 				    <a th:if="${!festivalPage.first}"
 				       th:href="@{${basePath}(
-				           page=${festivalPage.number - 1},
+				           page=0,
 				           size=${size},
 				           sort=${sort}
-				       )}">
-				        ‹
-				    </a>
+				       )}"
+				       aria-label="첫 페이지로 이동">처음</a>
 				
 				    <span th:if="${festivalPage.first}"
-				          class="is-disabled">
-				        ‹
-				    </span>
+				          class="is-disabled"
+				          aria-disabled="true">처음</span>
 				
-				    <a th:each="pageNumber : ${#numbers.sequence(0, festivalPage.totalPages - 1)}"
+				    <!-- 이전 번호 묶음 -->
+				    <a th:if="${startPage > 0}"
+				       th:href="@{${basePath}(
+				           page=${startPage - 1},
+				           size=${size},
+				           sort=${sort}
+				       )}"
+				       aria-label="이전 페이지 번호 묶음으로 이동">이전</a>
+				
+				    <span th:if="${startPage == 0}"
+				          class="is-disabled"
+				          aria-disabled="true">이전</span>
+				
+				    <!-- 최대 10개의 페이지 번호 -->
+				    <a th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
 				       th:href="@{${basePath}(
 				           page=${pageNumber},
 				           size=${size},
 				           sort=${sort}
 				       )}"
 				       th:text="${pageNumber + 1}"
-				       th:classappend="${pageNumber == festivalPage.number} ? 'is-active' : ''">
+				       th:classappend="${pageNumber == festivalPage.number} ? 'is-active' : ''"
+				       th:attr="aria-current=${pageNumber == festivalPage.number ? 'page' : null}">
 				    </a>
 				
-				    <a th:if="${!festivalPage.last}"
+				    <!-- 다음 번호 묶음 -->
+				    <a th:if="${endPage < festivalPage.totalPages - 1}"
 				       th:href="@{${basePath}(
-				           page=${festivalPage.number + 1},
+				           page=${endPage + 1},
 				           size=${size},
 				           sort=${sort}
-				       )}">
-				        ›
-				    </a>
+				       )}"
+				       aria-label="다음 페이지 번호 묶음으로 이동">다음</a>
+				
+				    <span th:if="${endPage >= festivalPage.totalPages - 1}"
+				          class="is-disabled"
+				          aria-disabled="true">다음</span>
+				
+				    <!-- 마지막 페이지 -->
+				    <a th:if="${!festivalPage.last}"
+				       th:href="@{${basePath}(
+				           page=${festivalPage.totalPages - 1},
+				           size=${size},
+				           sort=${sort}
+				       )}"
+				       aria-label="마지막 페이지로 이동">마지막</a>
 				
 				    <span th:if="${festivalPage.last}"
-				          class="is-disabled">
-				        ›
-				    </span>
+				          class="is-disabled"
+				          aria-disabled="true">마지막</span>
+				
 				</nav>
+				
+				<!-- 현재 페이지 / 전체 페이지 -->
+				<p class="ended-page-status"
+				   th:if="${festivalPage.totalPages > 0}"
+				   th:text="|${festivalPage.number + 1} / ${festivalPage.totalPages} 페이지|">
+				</p>
+
+
 				<div class="sync-info">
 				    <div class="sync-line"></div>
 				    <div class="sync-badge">

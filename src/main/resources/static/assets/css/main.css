@@ -2609,3 +2609,42 @@ a {
     opacity: 0.45;
     cursor: default;
 }
+
+
+/* 종료 행사 페이지 번호를 간결하게 표시 */
+.ended-pagination-compact {
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.ended-pagination-compact a,
+.ended-pagination-compact span {
+    min-width: 36px;
+    height: 38px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+/* 현재 페이지 / 전체 페이지 */
+.ended-page-status {
+    margin: 0 0 24px;
+    text-align: center;
+    color: #7b879d;
+    font-size: 13px;
+}
+
+/* 작은 화면에서는 버튼 크기와 간격 축소 */
+@media (max-width: 480px) {
+    .ended-pagination-compact {
+        gap: 4px;
+    }
+
+    .ended-pagination-compact a,
+    .ended-pagination-compact span {
+        min-width: 28px;
+        height: 34px;
+        padding: 0 6px;
+        font-size: 12px;
+    }
+}
